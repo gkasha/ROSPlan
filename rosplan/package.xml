@@ -9,6 +9,7 @@
 
 	<buildtool_depend>catkin</buildtool_depend>
 
+	<run_depend>rosplan_agent_interface</run_depend>
 	<run_depend>rosplan_knowledge_msgs</run_depend>
 	<run_depend>rosplan_dispatch_msgs</run_depend>
 	<run_depend>rosplan_dependencies</run_depend>

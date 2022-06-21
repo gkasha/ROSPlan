@@ -3,11 +3,11 @@
 namespace KCL_rosplan {
 
     Configurator::Configurator(ros::NodeHandle& nh, 
-                               std:string dp, 
-                               std::string ptdp) {
-        node_handle_ = nh;
+                               std::string dp, 
+                               std::string ptd) {
+        node_handle_ = &nh;
         domain_path_ = dp;
-        problem_template_dir_ = ptdp;
+        problem_template_dir_ = ptd;
     }
 
     Configurator::~Configurator() {
@@ -22,17 +22,17 @@ namespace KCL_rosplan {
 
     }
 
-    bool Configurator::configure() {
+    void Configurator::configure() {
 
     }
 
     void Configurator::goalRequestCallback(const rosplan_dispatch_msgs::ActionDispatch msg) {
-        ROS_INFO("KCL: (%s) Goal received.", ros::this_node::getName().c_str());
+        // ROS_INFO("KCL: (%s) Goal received.", ros::this_node::getName().c_str());
         
-        mission_start_time = ros::WallTime::now.toSec();
-        current_goal_ = msg;
+        // mission_start_time = ros::WallTime::now.toSec();
+        // current_goal_ = msg;
 
-        Configurator::configure();
+        // Configurator::configure();
     }
 
 } // close namespace

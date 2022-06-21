@@ -25,11 +25,11 @@ include_directories(${catkin_INCLUDE_DIRS})
 
 find_package(FLEX REQUIRED)
 
-add_definition(-Wno-deprecated-declarations)
+add_definitions(-Wno-deprecated-declarations)
 
 add_executable(configurator src/Configurator.cpp)
 
-add_dependencies(configurator ${CATKIN_EXPORTED_TARGETS})
+add_dependencies(configurator ${catkin_EXPORTED_TARGETS})
 
 target_link_libraries(configurator ${catkin_LIBRARIES})
 

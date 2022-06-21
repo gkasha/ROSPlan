@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<launch>
+
+    <!-- arguments -->
+    <arg name="node_name"                   default="rosplan_configurator_interface"/>
+    <arg name="goal_request_topic"          default=""/>
+    <arg name="problem_topic"               default=""/>
+    <arg name="domain_path"                 default=""/>
+    <arg name="problem_template_dir_path"   default=""/>
+    
+
+    <!-- configurator interfaace -->
+    <node name="$(arg node_name)" pkg="rosplan_agent_interface" type="configurator">
+
+        <!-- general options -->
+
+        <!-- ros topics -->
+        <param name="goal_request_topic"        value="$(arg goal_request_topic)"/>
+        <param name="problem_topic"             value="$(arg problem_topic"/>
+
+        <!-- directory for files -->
+        <param name="domain_path"               value="$(arg domain_path)"/>
+        <param name="problem_template_dir_path" value="$(arg problem_template_dir_path"/>
+        
+        <!-- to run the configurator -->
+    </node>
+</launch>
