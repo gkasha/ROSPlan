@@ -30,6 +30,7 @@ add_service_files(
   ParsingService.srv
   GetPlanningParams.srv
   DispatchService.srv
+  ConfigureService.srv
 )
 
 add_action_files(

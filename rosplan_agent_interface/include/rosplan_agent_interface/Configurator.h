@@ -13,6 +13,7 @@
 
 #include "ros/ros.h"
 #include "rosplan_dispatch_msgs/ActionDispatch.h"
+#include "rosplan_dispatch_msgs/ConfigureService.h"
 
 namespace KCL_rosplan
 {
@@ -30,13 +31,14 @@ namespace KCL_rosplan
         void getCurrentState();
         void genProblemFile();
 
-        void configure();
 
     public:
         Configurator(ros::NodeHandle& nh, std::string dp, std::string ptd);
         ~Configurator();
         
         void goalRequestCallback(const rosplan_dispatch_msgs::ActionDispatch msg);
+        bool configure(rosplan_dispatch_msgs::ConfigureService::Request &req,
+                       rosplan_dispatch_msgs::ConfigureService::Response &res);
     };
 }
 

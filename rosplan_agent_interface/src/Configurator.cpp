@@ -22,8 +22,11 @@ namespace KCL_rosplan {
 
     }
 
-    void Configurator::configure() {
+    bool Configurator::configure(rosplan_dispatch_msgs::ConfigureService::Request &req,
+                                 rosplan_dispatch_msgs::ConfigureService::Response &res) {
+        ROS_INFO("KCL: (%s) RECEIVED CALL TO CONFIGURE", ros::this_node::getName().c_str());
 
+        return true;
     }
 
     void Configurator::goalRequestCallback(const rosplan_dispatch_msgs::ActionDispatch msg) {
@@ -58,6 +61,9 @@ namespace KCL_rosplan {
         ros::Subscriber goal_sub = nh.subscribe(goalRequestTopic, 1000, &KCL_rosplan::Configurator::goalRequestCallback, &config);
 
         ROS_INFO("KCL: (%s) Ready to receive", ros::this_node::getName().c_str());
+        
+        // Advertise service
+        ros::ServiceServer service = nh.advertiseService("configure", &KCL_rosplan::Configurator::configure, &config);
         ros::spin();
         
         return 0;

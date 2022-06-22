@@ -11,7 +11,21 @@ find_package(catkin REQUIRED COMPONENTS
   rosplan_dependencies
   roslib
   rostest
+  message_generation
 )
+
+# add_service_files(
+#   FILES
+#   ConfigureService.srv
+# )
+
+# generate_messages(
+#    DEPENDENCIES
+#    actionlib_msgs
+#    diagnostic_msgs
+#    std_msgs
+# )
+
 
 catkin_package(
   INCLUDE_DIRS include ${catkin_INCLUDE_DIRS}
