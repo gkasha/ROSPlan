@@ -7,6 +7,7 @@
     <arg name="problem_topic"               default=""/>
     <arg name="domain_path"                 default=""/>
     <arg name="problem_template_dir_path"   default=""/>
+    <arg name="problem_file_path"           default=""/>
     <arg name="scripts_path"                default="$(find rosplan_agent_interface)/scripts/"/>
     
 
@@ -22,6 +23,7 @@
         <!-- directory for files -->
         <param name="domain_path"               value="$(arg domain_path)"/>
         <param name="problem_template_dir_path" value="$(arg problem_template_dir_path)"/>
+        <param name="problem_file_path"         value="$(arg problem_file_path)"/>
         <param name="scripts_path"              value="$(arg scripts_path)"/>
 
         <!-- to run the configurator -->

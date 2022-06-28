@@ -22,6 +22,7 @@ namespace KCL_rosplan
     private:
         std::string domain_path_;
         std::string problem_template_dir_;
+        std::string problem_path_;
         std::string scripts_;
 
         double mission_start_time_;
@@ -34,7 +35,8 @@ namespace KCL_rosplan
 
 
     public:
-        Configurator(ros::NodeHandle& nh, std::string dp, std::string ptd, std::string scripts);
+        Configurator(ros::NodeHandle& nh, std::string dp, std::string ptd, 
+                     std::string p_path, std::string scripts);
         ~Configurator();
         
         void goalRequestCallback(const rosplan_dispatch_msgs::ActionDispatch msg);

@@ -5,10 +5,12 @@ namespace KCL_rosplan {
     Configurator::Configurator(ros::NodeHandle& nh, 
                                std::string dp, 
                                std::string ptd,
+                               std::string p_path,
                                std::string scripts) {
         node_handle_ = &nh;
         domain_path_ = dp;
         problem_template_dir_ = ptd;
+        problem_path_ = p_path;
         scripts_ = scripts;
     }
 
@@ -20,8 +22,18 @@ namespace KCL_rosplan {
 
     }
 
+    /*
+     * Take goal, looks at problem templates to find best match
+     * Transforms problem template into pddl problem file
+     */
     void Configurator::genProblemFile() {
+        std::string data = problem_template_dir_ + "/data.json";
+        std::string problem_in = problem_template_dir_ + "/problem.pddl";
+        std::string problem_out = problem_path_;
+        std::string command = "python3 " + scripts_ + "transform.py " + data + " " 
+                                + problem_in + " " + problem_out;
 
+        std::system(command.c_str());
     }
 
     bool Configurator::configure(rosplan_dispatch_msgs::ConfigureService::Request &req,
@@ -31,14 +43,8 @@ namespace KCL_rosplan {
         ROS_INFO("\tPTD: %s",  problem_template_dir_.c_str());
         ROS_INFO("\tScripts: %s",  scripts_.c_str());
 
-        std::string data = problem_template_dir_ + "../data.json";
-        std::string problem_in = problem_template_dir_ + "../problem.pddl";
-        std::string problem_out = problem_template_dir_ + "../problem_out.pddl";
-        std::string command = "python3 " + scripts_ + "transform.py " + data + " " 
-                                + problem_in + " " + problem_out;
-
-        std::system(command.c_str());
-
+        
+        genProblemFile();
         return true;
     }
 
@@ -61,12 +67,13 @@ namespace KCL_rosplan {
         ros::NodeHandle nh("~");
 
         // Get Configurator Info
-        std::string domain_path, ptd_path, scripts;
+        std::string domain_path, ptd_path, p_path, scripts;
         nh.getParam("domain_path", domain_path);
         nh.getParam("problem_template_dir_path", ptd_path);
+        nh.getParam("problem_file_path", p_path);
         nh.getParam("scripts_path", scripts);
 
-        KCL_rosplan::Configurator config(nh, domain_path, ptd_path, scripts);
+        KCL_rosplan::Configurator config(nh, domain_path, ptd_path, p_path, scripts);
         
         // Subscribe to receive goals
         std::string goalRequestTopic = "goalRequest";
