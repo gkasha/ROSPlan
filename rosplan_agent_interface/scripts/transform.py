@@ -8,15 +8,15 @@ from rosplan_knowledge_msgs.msg import *
 # read the template from the standard input
 # input = "".join(sys.stdin.readlines())
 def callPropService(predicate_name):
-    print "Waiting for service"
+    # print "Waiting for service"
     rospy.wait_for_service('/rosplan_knowledge_base/state/propositions')
     try:
-        print "Calling Service"
+        # print "Calling Service"
         query_proxy = rospy.ServiceProxy('rosplan_knowledge_base/state/propositions', GetAttributeService)
         resp1 = query_proxy(predicate_name)
         return resp1
-    except rospy.ServiceException, e:
-        print "Service call failed: %s"%e
+    except (rospy.ServiceException, e):
+        # print "Service call failed: %s"%e
         return None
 
 def tif_filter(time, value, *function_name):
@@ -93,14 +93,36 @@ def transform(fluents_in, statics_in, template_string):
     compacted = remove_doubled_whitespace(transformed)
     return compacted
 
+def processJson(filename):
+    jF = open(filename, 'r')
+    data = json.load(jF)
+    jF.close()
+
+    return data
+
 def main(args):
     """ transforms the problem file template """
     
+    filename = args[0]
+    pddl_files = args[0]
+    filename = pddl_files + "root.json"
+    goal = args[1]
+    data = processJson(filename)
+
+    if not goal in data:
+        # print("Goal not reachable from root")
+        return
+
+    v = data[goal]
+    domain_file = pddl_files + v['domain_file']
+    problem_template = min(v['problem_templates'], key=lambda f : f['cost'])
+    goals = v['goals']
+
     # Get args
-    fluents_file = args[0]
-    statics_file = args[1]
-    template_file = open(args[2], 'r')
-    output_file = args[3]
+    fluents_file = pddl_files + problem_template['fluents']
+    statics_file = pddl_files + problem_template['nonfluents']
+    template_file = open(pddl_files + problem_template['name'], 'r')
+    output_file = pddl_files + problem_template['output']
     template_string = template_file.read()
     template_file.close()
 
@@ -109,6 +131,7 @@ def main(args):
     with open (output_file, 'w') as f:
         f.write(transformed)
         f.write("\n;; This PDDL problem file was generated on " +  str(datetime.datetime.now()))
+    print(domain_file + " " + output_file)
 
 if __name__ == "__main__":
     main(sys.argv[1:])

@@ -5,9 +5,8 @@
     <arg name="node_name"                   default="rosplan_configurator_interface"/>
     <arg name="goal_request_topic"          default=""/>
     <arg name="problem_topic"               default=""/>
-    <arg name="domain_path"                 default=""/>
-    <arg name="problem_template_dir_path"   default=""/>
-    <arg name="problem_file_path"           default=""/>
+    <arg name="pddl_file_path"              default=""/>
+    <arg name="planner"                     default="$(find rosplan_planning_system)/common/bin/popf"/>
     <arg name="scripts_path"                default="$(find rosplan_agent_interface)/scripts/"/>
     
 
@@ -21,11 +20,9 @@
         <param name="problem_topic"             value="$(arg problem_topic"/>
 
         <!-- directory for files -->
-        <param name="domain_path"               value="$(arg domain_path)"/>
-        <param name="problem_template_dir_path" value="$(arg problem_template_dir_path)"/>
-        <param name="problem_file_path"         value="$(arg problem_file_path)"/>
+        <param name="pddl_file_path"            value="$(arg pddl_file_path)"/>
         <param name="scripts_path"              value="$(arg scripts_path)"/>
-
+        <param name="planner"                   value="$(arg planner)"/>
         <!-- to run the configurator -->
     </node>
 </launch>
