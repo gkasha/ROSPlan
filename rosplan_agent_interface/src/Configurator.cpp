@@ -3,11 +3,13 @@
 namespace KCL_rosplan {
 
     Configurator::Configurator(ros::NodeHandle& nh, std::string pddl_files,
-                               std::string scripts, std::string planner) {
+                               std::string scripts, std::string planner, std::string output) {
         node_handle_ = &nh;
+        configure_pub_ = node_handle_->advertise<rosplan_dispatch_msgs::ConfigureReq>(output, 1);
         pddl_files_ = pddl_files;
         scripts_ = scripts;
         planner_ = planner;
+        output_ = output;
     }
 
     Configurator::~Configurator() {
@@ -60,6 +62,7 @@ namespace KCL_rosplan {
         return exec(command.c_str());
     }
 
+
     bool Configurator::configure(rosplan_dispatch_msgs::ConfigureService::Request &req,
                                  rosplan_dispatch_msgs::ConfigureService::Response &res) {
         ROS_INFO("KCL: (%s) RECEIVED CALL TO CONFIGURE", ros::this_node::getName().c_str());
@@ -71,8 +74,12 @@ namespace KCL_rosplan {
         std::vector<std::string> probresp = split(genProblemFile(), ' ');
         std::string domain_file = probresp[0];
         std::string problem_file = probresp[1];
+        std::vector<std::string> goals(probresp.begin() + 2, probresp.end());
         problem_file.erase(std::remove(problem_file.begin(), problem_file.end(), '\n'), problem_file.end());
         
+        // Initialize KB if not already
+
+
         // Generate plan
         rosplan_dispatch_msgs::PlanningService srv;
         srv.request.domain_path = domain_file;
@@ -88,6 +95,16 @@ namespace KCL_rosplan {
             ROS_ERROR("Failed to call planning service");
             return false;
         }
+
+        // Publish plan, send it to Executive
+        rosplan_dispatch_msgs::ConfigureReq msg;
+        msg.plan_topic = srv.request.data_path + "plan.pddl";//"/rosplan_planner_interface/planner_output";
+        for (std::string g : goals) {
+            msg.goals.push_back(g);
+        }
+
+        configure_pub_.publish(msg);
+        ROS_INFO("SENT MESSAGE TO EXECUTIVE: %s", msg.plan_topic.c_str());
         return true;
     }
 
@@ -110,11 +127,13 @@ namespace KCL_rosplan {
         ros::NodeHandle nh("~");
 
         // Get Configurator Info
-        std::string pddl_files, scripts, planner;
+        std::string pddl_files, scripts, planner, output;
         nh.getParam("pddl_file_path", pddl_files);
         nh.getParam("scripts_path", scripts);
         nh.getParam("planner", planner);
-        KCL_rosplan::Configurator config(nh, pddl_files, scripts, planner);
+        nh.getParam("output", output);
+
+        KCL_rosplan::Configurator config(nh, pddl_files, scripts, planner, output);
         
         // Subscribe to receive goals
         std::string goalRequestTopic = "goalRequest";

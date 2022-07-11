@@ -42,10 +42,13 @@ find_package(FLEX REQUIRED)
 add_definitions(-Wno-deprecated-declarations)
 
 add_executable(configurator src/Configurator.cpp)
+add_executable(executive src/Executive.cpp)
 
 add_dependencies(configurator ${catkin_EXPORTED_TARGETS})
+add_dependencies(executive ${catkin_EXPORTED_TARGETS})
 
 target_link_libraries(configurator ${catkin_LIBRARIES})
+target_link_libraries(executive ${catkin_LIBRARIES})
 
 
 

@@ -19,6 +19,7 @@ add_message_files(
    EsterelPlanEdge.msg
    EsterelPlanNode.msg
    CompletePlan.msg
+   ConfigureReq.msg
    ActionDispatch.msg
    ActionFeedback.msg
 )

@@ -131,7 +131,7 @@ def main(args):
     with open (output_file, 'w') as f:
         f.write(transformed)
         f.write("\n;; This PDDL problem file was generated on " +  str(datetime.datetime.now()))
-    print(domain_file + " " + output_file)
+    print(domain_file + " " + output_file + " " + " ".join(goals))
 
 if __name__ == "__main__":
     main(sys.argv[1:])

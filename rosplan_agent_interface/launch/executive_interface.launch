@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<launch>
+
+    <!-- arguments -->
+    <arg name="node_name"                   default="rosplan_executive_interface"/>
+    <arg name="configurator_topic"          default="/rosplan_configurator_interface/output"/>
+    <arg name="dispatch_topic"            default="/rosplan_executive_interface/dispatch"/>
+
+    <!-- Executive interface -->
+    <node name="$(arg node_name)" pkg="rosplan_agent_interface" type="executive" output="screen">
+
+        <!-- general options -->
+
+        <!-- ros topics -->
+
+        <!-- directory for files -->
+        
+        <!-- to run the Executive -->
+        <param name="configurator_topic"        value="$(arg configurator_topic)"/>
+        <param name="dispatch_topic"            value="$(arg dispatch_topic)"/>
+    </node>
+</launch>
