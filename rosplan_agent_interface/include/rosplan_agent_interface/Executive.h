@@ -11,7 +11,8 @@
 #include <chrono>
 #include <array>
 #include <vector>
-#include <sstream>
+#include <thread>
+#include <ros/callback_queue.h>
 
 #include "ros/ros.h"
 #include "rosplan_dispatch_msgs/ActionDispatch.h"
@@ -22,6 +23,9 @@
 #include "rosplan_dispatch_msgs/EsterelPlan.h"
 #include "rosplan_dispatch_msgs/ParsingService.h"
 #include "rosplan_dispatch_msgs/DispatchService.h"
+#include "rosplan_knowledge_msgs/KnowledgeItem.h"
+#include "rosplan_knowledge_msgs/KnowledgeQueryService.h"
+#include "rosplan_knowledge_msgs/GetAttributeService.h"
 
 namespace KCL_rosplan
 {
@@ -37,7 +41,8 @@ namespace KCL_rosplan
         Executive(ros::NodeHandle& nh, std::string configurator_topic, std::string dispatch_topic);
         ~Executive();
 
-        void planCallback(const rosplan_dispatch_msgs::EsterelPlan plan);
+        // void callService(const rosplan_dispatch_msgs::CompletePlan plan);
+        void planCallback(const rosplan_dispatch_msgs::CompletePlan plan);
         void configureCallback(const rosplan_dispatch_msgs::ConfigureReq msg);
 
         

@@ -7,32 +7,35 @@ namespace KCL_rosplan {
         node_handle_ = &nh;
         configurator_topic_ = configurator_topic;
         dispatch_topic_ = dispatch_topic;
-        dispatch_pub_ = node_handle_->advertise<rosplan_dispatch_msgs::EsterelPlan>(dispatch_topic, 1);
+        dispatch_pub_ = node_handle_->advertise<rosplan_dispatch_msgs::CompletePlan>(dispatch_topic, 1);
     }
     Executive::~Executive() {
 
     }
 
+    void callService(ros::ServiceClient client, const rosplan_dispatch_msgs::CompletePlan plan) {
+        // Now want to dispatch plan
+        
+    }
     /*
      * We have the Executive first receive the plan, then send
      * it to the dispatcher, because we may need to do some
      * preprocessing of the plan
      */
-    void Executive::planCallback(const rosplan_dispatch_msgs::EsterelPlan plan) {
+    void Executive::planCallback(const rosplan_dispatch_msgs::CompletePlan plan) {
         ROS_INFO("RECEIVED PLAN TO DISPATCH");
-        
-        
-        // Now want to dispatch plan
         dispatch_pub_.publish(plan);
+        ros::ServiceClient client = node_handle_->serviceClient<rosplan_dispatch_msgs::DispatchService>("/rosplan_plan_dispatcher/dispatch_plan");
+        
         rosplan_dispatch_msgs::DispatchService srv;
 
-        ros::ServiceClient client = node_handle_->serviceClient<rosplan_dispatch_msgs::DispatchService>("/rosplan_plan_dispatcher/dispatch_plan");
         if (client.call(srv)) {
             ROS_INFO("Dispatcher was called");
         } else {
             ROS_INFO("Failed to call dispatcher service");
             return;
         }
+        
     }
 
     void Executive::configureCallback(const rosplan_dispatch_msgs::ConfigureReq msg) {
@@ -42,6 +45,7 @@ namespace KCL_rosplan {
 
         for (std::string g : msg.goals) {
             goals.push_back(g);
+            ROS_INFO("GOAL: %s", g.c_str());
         }
         
         // Received plan topic, now want to invoke plan parser
@@ -56,9 +60,33 @@ namespace KCL_rosplan {
             return;
         }
 
+        ros::MultiThreadedSpinner spinner(4);
         // Get plan from planner
         ros::Subscriber sub = node_handle_->subscribe("/rosplan_parsing_interface/complete_plan", 1, &KCL_rosplan::Executive::planCallback, this);
-        ros::spin();
+        
+        // Monitor execution for goals
+        ros::Rate loop_rate(5);
+        while (ros::ok()) {
+            // Want to query the KB for the opportunity list
+            for (std::string g : goals) {
+                // Construct query
+                rosplan_knowledge_msgs::GetAttributeService k_srv;
+                k_srv.request.predicate_name = g;
+                ros::ServiceClient k_client = node_handle_->serviceClient<rosplan_knowledge_msgs::GetAttributeService>("/rosplan_knowledge_base/state/propositions");
+                if (k_client.call(k_srv)) {
+                    ROS_INFO("GET ATTRIBUTE SERVICE CALLED");
+                    for (auto attribute : k_srv.response.attributes) {
+                        if (attribute.is_negative == false) {
+                            ROS_INFO("\n ---------------\nGOAL FOUND\n ---------------\n");
+                            return;
+                        }
+                    }
+                } else {
+                    // ROS_INFO("GET ATTRIBUTE SERVICE FAILED");
+                }
+            }
+            ros::spinOnce();
+        }
     }
 }
 
