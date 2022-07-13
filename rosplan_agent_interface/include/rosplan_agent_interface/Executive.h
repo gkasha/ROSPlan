@@ -26,6 +26,7 @@
 #include "rosplan_knowledge_msgs/KnowledgeItem.h"
 #include "rosplan_knowledge_msgs/KnowledgeQueryService.h"
 #include "rosplan_knowledge_msgs/GetAttributeService.h"
+#include "std_srvs/Empty.h"
 
 namespace KCL_rosplan
 {
@@ -44,6 +45,7 @@ namespace KCL_rosplan
         // void callService(const rosplan_dispatch_msgs::CompletePlan plan);
         void planCallback(const rosplan_dispatch_msgs::CompletePlan plan);
         void configureCallback(const rosplan_dispatch_msgs::ConfigureReq msg);
+        std::string monitorExecution(std::vector<std::string> goals);
 
         
     };

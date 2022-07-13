@@ -51,12 +51,11 @@ namespace KCL_rosplan {
      * Take goal, looks at problem templates to find best match
      * Transforms problem template into pddl problem file
      */
-    std::string Configurator::genProblemFile() {
+    std::string Configurator::genProblemFile(std::string goal) {
 
         // Finally, call transform.py to generate problem file
         // This will query the KB based on the fluents file, and then fill in
         // information from both the fixed and fluents
-        std::string goal = "leak-alert";
         std::string command = "python3 " + scripts_ + "transform.py " + pddl_files_ + " " + goal;
 
         return exec(command.c_str());
@@ -71,14 +70,20 @@ namespace KCL_rosplan {
 
         
         // Get domain file and generate problem file
-        std::vector<std::string> probresp = split(genProblemFile(), ' ');
+        std::vector<std::string> probresp = split(genProblemFile(req.goal), ' ');
         std::string domain_file = probresp[0];
         std::string problem_file = probresp[1];
         std::vector<std::string> goals(probresp.begin() + 2, probresp.end());
         problem_file.erase(std::remove(problem_file.begin(), problem_file.end(), '\n'), problem_file.end());
         
         // Initialize KB if not already
-
+        ros::ServiceClient client = node_handle_->serviceClient<std_srvs::Empty>("/rosplan_knowledge_base/clear");
+        std_srvs::Emtpy clear_srv;
+        if (client.call(clear_srv)) {
+            ROS_INFO("CLEARED KB");
+        } else{
+            ROS_INFO("UNABLE TO CLEAR KB");
+        }
 
         // Generate plan
         rosplan_dispatch_msgs::PlanningService srv;
@@ -88,7 +93,7 @@ namespace KCL_rosplan {
         srv.request.planner_command = "timeout 10 " + planner_ + " DOMAIN PROBLEM";
         srv.request.use_problem_topic = false;
 
-        ros::ServiceClient client = node_handle_->serviceClient<rosplan_dispatch_msgs::PlanningService>("/rosplan_planner_interface/planning_server_params");
+        client = node_handle_->serviceClient<rosplan_dispatch_msgs::PlanningService>("/rosplan_planner_interface/planning_server_params");
         if (client.call(srv)) {
             ROS_INFO("Plan found: %d", srv.response.plan_found);
         } else {
@@ -100,6 +105,7 @@ namespace KCL_rosplan {
         rosplan_dispatch_msgs::ConfigureReq msg;
         msg.plan_topic = srv.request.data_path + "plan.pddl";//"/rosplan_planner_interface/planner_output";
         for (std::string g : goals) {
+            g.erase(std::remove(g.begin(), g.end(), '\n'), g.end());
             msg.goals.push_back(g);
         }
 

@@ -38,7 +38,7 @@ namespace KCL_rosplan
         ros::NodeHandle* node_handle_;
 
         void getCurrentState();
-        std::string genProblemFile();
+        std::string genProblemFile(std::string goal);
 
 
     public:

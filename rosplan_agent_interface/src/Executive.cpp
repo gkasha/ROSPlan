@@ -38,6 +38,37 @@ namespace KCL_rosplan {
         
     }
 
+    std::string Executive::monitorExecution(std::vector<std::string> goals) {
+        ros::Rate loop_rate(5);
+
+        while (ros::ok()) {
+            // Want to query the KB for the opportunity list
+            for (std::string g : goals) {
+                // Construct query
+                rosplan_knowledge_msgs::GetAttributeService k_srv;
+                k_srv.request.predicate_name = g;
+                ros::ServiceClient k_client = node_handle_->serviceClient<rosplan_knowledge_msgs::GetAttributeService>("/rosplan_knowledge_base/state/propositions");
+                if (k_client.call(k_srv)) {
+                    for (auto attribute : k_srv.response.attributes) {
+                        ROS_INFO("\n ---------------\nGOAL FOUND\n ---------------\n");
+                        if (attribute.is_negative == false) {
+                            // Cancel dispatch
+                            std_srvs::Empty cancel_dispatch;
+                            ros::ServiceClient cancel_client = node_handle_->serviceClient<std_srvs::Empty>("/rosplan_plan_dispatcher/cancel_dispatch");
+                            if (cancel_client.call(cancel_dispatch)) {
+                                ROS_INFO("DISPATCH CANCELLED");
+                                return g;
+                            } else {
+                                ROS_INFO("Unable to cancel dispatch");
+                                return "";
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     void Executive::configureCallback(const rosplan_dispatch_msgs::ConfigureReq msg) {
         ROS_INFO("RECEIVED CONFIGURE REQUEST");
         std::string plan_topic = msg.plan_topic;
@@ -49,44 +80,47 @@ namespace KCL_rosplan {
         }
         
         // Received plan topic, now want to invoke plan parser
-        rosplan_dispatch_msgs::ParsingService srv;
-        srv.request.plan_path = plan_topic;
+        rosplan_dispatch_msgs::ParsingService parse_srv;
+        parse_srv.request.plan_path = plan_topic;
 
         ros::ServiceClient client = node_handle_->serviceClient<rosplan_dispatch_msgs::ParsingService>("/rosplan_parsing_interface/parse_plan_from_file");
-        if (client.call(srv)) {
+        if (client.call(parse_srv)) {
             ROS_INFO("Parser was called");
         } else {
             ROS_INFO("Failed to call parsing service");
             return;
         }
 
-        ros::MultiThreadedSpinner spinner(4);
+        // Handle dispatcher in separate thread
+        ros::NodeHandle nh_dispatch;
+        ros::CallbackQueue dispatch_queue;
+        nh_dispatch.setCallbackQueue(&dispatch_queue);
+        ros::AsyncSpinner spinner(2, &dispatch_queue);
         // Get plan from planner
-        ros::Subscriber sub = node_handle_->subscribe("/rosplan_parsing_interface/complete_plan", 1, &KCL_rosplan::Executive::planCallback, this);
+        ros::Subscriber sub = nh_dispatch.subscribe("/rosplan_parsing_interface/complete_plan", 1, &KCL_rosplan::Executive::planCallback, this);
         
         // Monitor execution for goals
-        ros::Rate loop_rate(5);
-        while (ros::ok()) {
-            // Want to query the KB for the opportunity list
-            for (std::string g : goals) {
-                // Construct query
-                rosplan_knowledge_msgs::GetAttributeService k_srv;
-                k_srv.request.predicate_name = g;
-                ros::ServiceClient k_client = node_handle_->serviceClient<rosplan_knowledge_msgs::GetAttributeService>("/rosplan_knowledge_base/state/propositions");
-                if (k_client.call(k_srv)) {
-                    ROS_INFO("GET ATTRIBUTE SERVICE CALLED");
-                    for (auto attribute : k_srv.response.attributes) {
-                        if (attribute.is_negative == false) {
-                            ROS_INFO("\n ---------------\nGOAL FOUND\n ---------------\n");
-                            return;
-                        }
-                    }
-                } else {
-                    // ROS_INFO("GET ATTRIBUTE SERVICE FAILED");
-                }
+        spinner.start();
+        std::string status = monitorExecution(goals);
+        spinner.stop();
+
+        if (status != "") {
+            // Achieved a goal, now want to post new goal to Configurator
+            client = node_handle_->serviceClient<rosplan_dispatch_msgs::ConfigureService>("/rosplan_configurator_interface/configure");
+            rosplan_dispatch_msgs::ConfigureService configure_srv;
+            configure_srv.request.goal = status;
+            if (client.call(configure_srv)) {
+                ROS_INFO("POSTED NEW GOAL: %s", status.c_str());
+                return;
+            } else {
+                ROS_INFO("UNABLE TO POST NEW GOAL: %s", status.c_str());
+                return;
             }
-            ros::spinOnce();
+        } else {
+            // Something unexpected happened, how should we handle it?
         }
+        return;
+        
     }
 }
 
