@@ -10,6 +10,7 @@ namespace KCL_rosplan {
         scripts_ = scripts;
         planner_ = planner;
         output_ = output;
+        running_ = false;
     }
 
     Configurator::~Configurator() {
@@ -77,13 +78,26 @@ namespace KCL_rosplan {
         problem_file.erase(std::remove(problem_file.begin(), problem_file.end(), '\n'), problem_file.end());
         
         // Initialize KB if not already
-        ros::ServiceClient client = node_handle_->serviceClient<std_srvs::Empty>("/rosplan_knowledge_base/clear");
-        std_srvs::Emtpy clear_srv;
-        if (client.call(clear_srv)) {
-            ROS_INFO("CLEARED KB");
-        } else{
-            ROS_INFO("UNABLE TO CLEAR KB");
+        if (running_) {
+            // Need to shut down all nodes
+            std::string cmd1 = "rosnode kill " + knowledge_base_;
+            std::string cmd2 = "rosnode kill " + executive_;
+            std::string cmd3 = "rosnode kill " + dispatcher_;
+            system(cmd1.c_str());
+            system(cmd2.c_str());
+            system(cmd3.c_str());
+        } else {
+            running_ = true;
         }
+
+        std::string launch_file_ = scripts_ + " spawnNodes.launch";
+        configurator_ = "rosplan_configurator_interface";
+        knowledge_base_ = "rosplan_knowledge_base";
+        executive_ = "rosplan_executive_interface";
+        dispatcher_ = "rosplan_plan_dispatcher";
+        std::string command = "python3 " + scripts_ + "launchNodes.py " + launch_file_ + " " + configurator_ + " " + knowledge_base_
+                                + " " + executive_ + " " + dispatcher_ + " " + domain_file + " " + problem_file;
+        std::string x = exec(command.c_str());
 
         // Generate plan
         rosplan_dispatch_msgs::PlanningService srv;
@@ -93,7 +107,7 @@ namespace KCL_rosplan {
         srv.request.planner_command = "timeout 10 " + planner_ + " DOMAIN PROBLEM";
         srv.request.use_problem_topic = false;
 
-        client = node_handle_->serviceClient<rosplan_dispatch_msgs::PlanningService>("/rosplan_planner_interface/planning_server_params");
+        ros::ServiceClient client = node_handle_->serviceClient<rosplan_dispatch_msgs::PlanningService>("/rosplan_planner_interface/planning_server_params");
         if (client.call(srv)) {
             ROS_INFO("Plan found: %d", srv.response.plan_found);
         } else {

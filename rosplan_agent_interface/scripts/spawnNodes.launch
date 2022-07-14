@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<launch>
+	<arg name="pddl_file_path"	default="/home/gkasha/Documents/continual_planning/ROSPlan/pddl_files/"/>
+	
+	<arg name="configurator_node"	default="rosplan_configurator_interface"/>
+	<arg name="knowledge_node"	default="rosplan_knowledge_base"/>
+	<arg name="executive_node"	default="rosplan_executive_interface"/>
+	<arg name="dispatcher_node"	default="rosplan_plan_dispatcher"/>
+
+	<arg name="domain_path"		default="$(arg pddl_file_path)/domains/survey.pddl"/>
+	<arg name="problem_path"	default="$(arg pddl_file_path)/problems/problem_survey.pddl"/>
+
+	<!-- KB -->
+	<node name="$(arg knowledge_node)" pkg="rosplan_knowledge_base" type="knowledgeBase" respawn="false" output="screen">
+		<param name="domain_path"	value="$(arg domain_path)"/>
+		<param name="problem_path"	value="$(arg problem_path)"/>
+		<!-- conditional planning flags -->
+		<param name="use_unknowns"	value="false"/>
+	</node>
+
+	<!-- Executive -->
+	<include file="$(find rosplan_agent_interface)/launch/executive_interface.launch">
+		<arg name="node_name"			value="$(arg executive_node)"/>
+		<arg name="configurator_topic"	value="/$(arg configurator_node)/output"/>
+		<arg name="dispatch_topic"		value="output"/>
+	</include>
+
+	<!-- Dispatch -->
+	<node name="$(arg dispatcher_node)" pkg="rosplan_planning_system" type="pddl_simple_plan_dispatcher" respawn="false" output="screen">
+		<param name="knowledge_base"	value="$(arg knowledge_node)"/>
+		<param name="plan_topic"		value="/$(arg executive_node)/output"/>
+		<param name="action_dispatch_topic"	value="action_dispatch"/>
+		<param name="action_feedback_topic"	value="action_feedback"/>
+	</node>
+</launch>

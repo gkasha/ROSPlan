@@ -29,6 +29,12 @@ namespace KCL_rosplan
         std::string scripts_;
         std::string planner_;
         std::string output_;
+        std::string configurator_;
+        std::string knowledge_base_;
+        std::string executive_;
+        std::string dispatcher_;
+
+        bool running_;
 
         ros::Publisher configure_pub_;
 
