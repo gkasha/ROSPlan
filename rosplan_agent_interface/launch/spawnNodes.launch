@@ -7,8 +7,8 @@
 	<arg name="executive_node"	default="rosplan_executive_interface"/>
 	<arg name="dispatcher_node"	default="rosplan_plan_dispatcher"/>
 
-	<arg name="domain_path"		default="$(arg pddl_file_path)/domains/survey.pddl"/>
-	<arg name="problem_path"	default="$(arg pddl_file_path)/problems/problem_survey.pddl"/>
+	<arg name="domain_path"		default="$(arg pddl_file_path)/domains/leak_failure.pddl"/>
+	<arg name="problem_path"	default="$(arg pddl_file_path)/problems/problem_leak_failure.pddl"/>
 
 	<!-- KB -->
 	<node name="$(arg knowledge_node)" pkg="rosplan_knowledge_base" type="knowledgeBase" respawn="false" output="screen">

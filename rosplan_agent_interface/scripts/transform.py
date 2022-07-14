@@ -1,4 +1,4 @@
-import sys, os, datetime, json, rospy
+import sys, os, datetime, json, rospy, roslaunch
 from jinja2 import Template, Environment
 from typing import Dict, List
 
@@ -7,7 +7,7 @@ from rosplan_knowledge_msgs.msg import *
 
 # read the template from the standard input
 # input = "".join(sys.stdin.readlines())
-def callPropService(predicate_name):
+def callPropService(predicate_name, unknown):
     # print "Waiting for service"
     rospy.wait_for_service('/rosplan_knowledge_base/state/propositions')
     try:
@@ -55,41 +55,56 @@ def processFluents(file_in):
     
     fluents = []
 
-    for pred in data['data']:
-        # Construct query, get result
-        predicate_name = pred['predicate_name']
-        key = pred['key']
-        val = None
+    for x in data:
+        for pred in data[x]:
+            # Construct query, get result
+            predicate_name = pred['predicate_name']
+            keys = pred['key']
+            val = None
 
-        rep = callPropService(predicate_name)
-        
-        for elt in rep.attributes:
-            if elt.values[0].value == key:
-                s = "("
-                neg = False
-                val = elt.values[1].value
-                if elt.is_negative:
-                    s += "not ("
-                    neg = True
-                s += predicate_name + " " + key + " " + val + ")"
-                if neg:
-                    s += ")\n"
-                fluents.append(s)
+            rep = callPropService(predicate_name)
+            
+            for elt in rep.attributes:
+                match = True
+                n = len(elt.values)
+                unknowns = False
+                if (pred == "unknowns"):
+                    n -= 1
+                    unknowns = True
+
+                # See if predicate matches
+                for i in range(n):
+                    if elt.values[i].value != keys[i]:
+                        match = False
+
+                if match:
+                    s = "("
+                    neg = False
+                    if unknowns:
+                        val = elt.values[-1].value
+                        s += predicate_name + " " + " ".join(keys) + " " + val + ")"
+                    else:
+                        s += predicate_name + " " + " ".join(keys) + ")"
+
+                    if elt.is_negative:
+                        s = "not (" + s + ")"
+                    fluents.append(s)
+
 
     return fluents
 
-def processStatics(file_in):
-    f = open(file_in, 'r')
-    data = f.read().split("\n")
-    return data
+# def processStatics(file_in):
+#     f = open(file_in, 'r')
+#     data = f.read().split("\n")
+#     return data
 
-def transform(fluents_in, statics_in, template_string):
+def transform(fluents_in, template_string):
     """ transforms the template; this function may be called from other Python code, e.g. Flask web service """
 
     fluents = processFluents(fluents_in)
-    statics = processStatics(statics_in)
+    # statics = processStatics(statics_in)
     template = load_template_from_string(template_string)
-    transformed = template.render(fluents=fluents, statics=statics)
+    transformed = template.render(fluents=fluents)
     compacted = remove_doubled_whitespace(transformed)
     return compacted
 
@@ -115,19 +130,46 @@ def main(args):
 
     v = data[goal]
     domain_file = pddl_files + v['domain_file']
+
+    initial_problem = ""
+    if "initial_problem" in data[v]:
+        initial_problem = pddl_files + data[v][initial_problem]
+        # Since this is an intial problem, we want to start up nodes
+        configurator = 'configurator_node:='+'rosplan_configurator_interface'
+        knowledgeBase = 'knowledge_node:='+'rosplan_knowledge_base'
+        executive = 'executive_node:='+'rosplan_executive_interface'
+        dispatcher = 'dispatcher_node:='+'rosplan_plan_dispatcher'
+
+        initial_domain = domain_file
+        if "initial_domain" in data[v]:
+            initial_domain = pddl_files + data[v][initial_domain]
+            
+        uuid = roslaunch.rlutil.get_or_generate_uuid(None, False)
+        roslaunch.configure_logging(uuid)
+
+        cli_args1 = ['rosplan_agent_interface', 'spawnNodes.launch', configurator, knowledgeBase, executive, dispatcher, initial_domain, initial_problem]
+        roslaunch_file1 = roslaunch.rlutil.resolve_launch_arguments(cli_args1)
+        roslaunch_args1 = cli_args1[2:]
+
+        launch_files = [(roslaunch_file1, roslaunch_args1)]
+        parent = roslaunch.parent.ROSLaunchParent(uuid, launch_files)
+
+        parent.start()
+
+
+    
     problem_template = min(v['problem_templates'], key=lambda f : f['cost'])
     goals = v['goals']
 
     # Get args
     fluents_file = pddl_files + problem_template['fluents']
-    statics_file = pddl_files + problem_template['nonfluents']
     template_file = open(pddl_files + problem_template['name'], 'r')
     output_file = pddl_files + problem_template['output']
     template_string = template_file.read()
     template_file.close()
 
     # Transform data and write to output
-    transformed = transform(fluents_file, statics_file, template_string)
+    transformed = transform(fluents_file, template_string)
     with open (output_file, 'w') as f:
         f.write(transformed)
         f.write("\n;; This PDDL problem file was generated on " +  str(datetime.datetime.now()))

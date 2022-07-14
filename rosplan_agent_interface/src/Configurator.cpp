@@ -51,6 +51,8 @@ namespace KCL_rosplan {
     /*
      * Take goal, looks at problem templates to find best match
      * Transforms problem template into pddl problem file
+     * This also intializes the KB, dispatcher, and Executive if they do
+     * not exist
      */
     std::string Configurator::genProblemFile(std::string goal) {
 
@@ -58,7 +60,7 @@ namespace KCL_rosplan {
         // This will query the KB based on the fluents file, and then fill in
         // information from both the fixed and fluents
         std::string command = "python3 " + scripts_ + "transform.py " + pddl_files_ + " " + goal;
-
+        running_ = true;
         return exec(command.c_str());
     }
 
@@ -76,28 +78,6 @@ namespace KCL_rosplan {
         std::string problem_file = probresp[1];
         std::vector<std::string> goals(probresp.begin() + 2, probresp.end());
         problem_file.erase(std::remove(problem_file.begin(), problem_file.end(), '\n'), problem_file.end());
-        
-        // Initialize KB if not already
-        if (running_) {
-            // Need to shut down all nodes
-            std::string cmd1 = "rosnode kill " + knowledge_base_;
-            std::string cmd2 = "rosnode kill " + executive_;
-            std::string cmd3 = "rosnode kill " + dispatcher_;
-            system(cmd1.c_str());
-            system(cmd2.c_str());
-            system(cmd3.c_str());
-        } else {
-            running_ = true;
-        }
-
-        std::string launch_file_ = scripts_ + " spawnNodes.launch";
-        configurator_ = "rosplan_configurator_interface";
-        knowledge_base_ = "rosplan_knowledge_base";
-        executive_ = "rosplan_executive_interface";
-        dispatcher_ = "rosplan_plan_dispatcher";
-        std::string command = "python3 " + scripts_ + "launchNodes.py " + launch_file_ + " " + configurator_ + " " + knowledge_base_
-                                + " " + executive_ + " " + dispatcher_ + " " + domain_file + " " + problem_file;
-        std::string x = exec(command.c_str());
 
         // Generate plan
         rosplan_dispatch_msgs::PlanningService srv;
