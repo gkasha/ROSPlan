@@ -1,4 +1,4 @@
-import sys, os, datetime, json, rospy, roslaunch
+import sys, os, datetime, json, rospy, roslaunch, subprocess
 from jinja2 import Template, Environment
 from typing import Dict, List
 
@@ -7,12 +7,12 @@ from rosplan_knowledge_msgs.msg import *
 
 # read the template from the standard input
 # input = "".join(sys.stdin.readlines())
-def callPropService(predicate_name, unknown):
+def callPropService(predicate_name):
     # print "Waiting for service"
     rospy.wait_for_service('/rosplan_knowledge_base/state/propositions')
     try:
         # print "Calling Service"
-        query_proxy = rospy.ServiceProxy('rosplan_knowledge_base/state/propositions', GetAttributeService)
+        query_proxy = rospy.ServiceProxy('/rosplan_knowledge_base/state/propositions', GetAttributeService)
         resp1 = query_proxy(predicate_name)
         return resp1
     except (rospy.ServiceException, e):
@@ -52,46 +52,39 @@ def processFluents(file_in):
     json_file = open(file_in, 'r')
     data = json.load(json_file)
     json_file.close()
+
+    domain = data['domain']
+    resources = data['resources']
+    raw_predicates = data['predicates']
+    goals = data['goals']
     
-    fluents = []
+    predicates = []
 
-    for x in data:
-        for pred in data[x]:
-            # Construct query, get result
-            predicate_name = pred['predicate_name']
-            keys = pred['key']
-            val = None
+    for p in raw_predicates:
+        # Construct query, get result
+        key = resources[0]['key']
+        val = resources[0]['value']
 
-            rep = callPropService(predicate_name)
-            
-            for elt in rep.attributes:
-                match = True
-                n = len(elt.values)
-                unknowns = False
-                if (pred == "unknowns"):
-                    n -= 1
-                    unknowns = True
-
-                # See if predicate matches
-                for i in range(n):
-                    if elt.values[i].value != keys[i]:
+        rep = callPropService(p)
+        
+        
+        for elt in rep.attributes:
+            match = True
+            line = "(" + p
+            for x in elt.values:
+                line += " " + x.value
+                if x.key == key:
+                    if x.value != val:
                         match = False
-
-                if match:
-                    s = "("
-                    neg = False
-                    if unknowns:
-                        val = elt.values[-1].value
-                        s += predicate_name + " " + " ".join(keys) + " " + val + ")"
-                    else:
-                        s += predicate_name + " " + " ".join(keys) + ")"
-
-                    if elt.is_negative:
-                        s = "not (" + s + ")"
-                    fluents.append(s)
+                        break
+            if match:
+                line += ")"
+                if elt.is_negative:
+                    line = "(not " + line + ")"
+                predicates.append(line)
 
 
-    return fluents
+    return domain,resources,predicates,goals
 
 # def processStatics(file_in):
 #     f = open(file_in, 'r')
@@ -101,10 +94,10 @@ def processFluents(file_in):
 def transform(fluents_in, template_string):
     """ transforms the template; this function may be called from other Python code, e.g. Flask web service """
 
-    fluents = processFluents(fluents_in)
+    domain,resources,predicates,goals = processFluents(fluents_in)
     # statics = processStatics(statics_in)
     template = load_template_from_string(template_string)
-    transformed = template.render(fluents=fluents)
+    transformed = template.render(domain=domain,resources=resources,predicates=predicates,goals=goals)
     compacted = remove_doubled_whitespace(transformed)
     return compacted
 
@@ -130,34 +123,6 @@ def main(args):
 
     v = data[goal]
     domain_file = pddl_files + v['domain_file']
-
-    initial_problem = ""
-    if "initial_problem" in data[v]:
-        initial_problem = pddl_files + data[v][initial_problem]
-        # Since this is an intial problem, we want to start up nodes
-        configurator = 'configurator_node:='+'rosplan_configurator_interface'
-        knowledgeBase = 'knowledge_node:='+'rosplan_knowledge_base'
-        executive = 'executive_node:='+'rosplan_executive_interface'
-        dispatcher = 'dispatcher_node:='+'rosplan_plan_dispatcher'
-
-        initial_domain = domain_file
-        if "initial_domain" in data[v]:
-            initial_domain = pddl_files + data[v][initial_domain]
-            
-        uuid = roslaunch.rlutil.get_or_generate_uuid(None, False)
-        roslaunch.configure_logging(uuid)
-
-        cli_args1 = ['rosplan_agent_interface', 'spawnNodes.launch', configurator, knowledgeBase, executive, dispatcher, initial_domain, initial_problem]
-        roslaunch_file1 = roslaunch.rlutil.resolve_launch_arguments(cli_args1)
-        roslaunch_args1 = cli_args1[2:]
-
-        launch_files = [(roslaunch_file1, roslaunch_args1)]
-        parent = roslaunch.parent.ROSLaunchParent(uuid, launch_files)
-
-        parent.start()
-
-
-    
     problem_template = min(v['problem_templates'], key=lambda f : f['cost'])
     goals = v['goals']
 

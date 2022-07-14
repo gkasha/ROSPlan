@@ -59,7 +59,7 @@ namespace KCL_rosplan {
         // Finally, call transform.py to generate problem file
         // This will query the KB based on the fluents file, and then fill in
         // information from both the fixed and fluents
-        std::string command = "python3 " + scripts_ + "transform.py " + pddl_files_ + " " + goal;
+        std::string command = "python " + scripts_ + "transform.py " + pddl_files_ + " " + goal;
         running_ = true;
         return exec(command.c_str());
     }

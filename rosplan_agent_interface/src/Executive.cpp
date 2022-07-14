@@ -30,7 +30,7 @@ namespace KCL_rosplan {
         rosplan_dispatch_msgs::DispatchService srv;
 
         if (client.call(srv)) {
-            ROS_INFO("Dispatcher was called");
+            ROS_INFO("Dispatcher was called, success: %d, goal_achieved: %d", srv.response.success, srv.response.goal_achieved);
         } else {
             ROS_INFO("Failed to call dispatcher service");
             return;
@@ -50,7 +50,7 @@ namespace KCL_rosplan {
                 ros::ServiceClient k_client = node_handle_->serviceClient<rosplan_knowledge_msgs::GetAttributeService>("/rosplan_knowledge_base/state/propositions");
                 if (k_client.call(k_srv)) {
                     for (auto attribute : k_srv.response.attributes) {
-                        ROS_INFO("\n ---------------\nGOAL FOUND\n ---------------\n");
+                        ROS_INFO("\n ---------------\nGOAL FOUND: %s\n ---------------\n", g.c_str());
                         if (attribute.is_negative == false) {
                             // Cancel dispatch
                             std_srvs::Empty cancel_dispatch;
@@ -75,6 +75,7 @@ namespace KCL_rosplan {
         std::vector<std::string> goals;
 
         for (std::string g : msg.goals) {
+            if (g == "") continue;
             goals.push_back(g);
             ROS_INFO("GOAL: %s", g.c_str());
         }
