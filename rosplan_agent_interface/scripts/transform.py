@@ -111,7 +111,6 @@ def processJson(filename):
 def main(args):
     """ transforms the problem file template """
     
-    filename = args[0]
     pddl_files = args[0]
     filename = pddl_files + "root.json"
     goal = args[1]

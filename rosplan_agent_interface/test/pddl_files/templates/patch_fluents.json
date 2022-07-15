@@ -1,0 +1,24 @@
+{
+    "domain": "patch",
+    "resources":
+    [
+        {
+            "key": "v",
+            "value": "r2"
+        }
+    ],
+    "predicates":
+    [
+        "at",
+        "waypoint_not_occupied",
+        "found",
+        "canexame",
+        "canreach",
+        "leak_state",
+        "leak_goal_completed"
+    ],
+    "goals":
+    [
+        "(>= (leak_goal_completed leak_000) 1)"
+    ]
+}

@@ -1,0 +1,24 @@
+{
+    "domain": "survey",
+    "resources":
+    [
+        {
+            "key": "v",
+            "value": "astrobee"
+        }
+    ],
+    "predicates":
+    [
+        "at",
+        "waypoint_not_occupied",
+        "found",
+        "canexamine",
+        "canreach"
+    ],
+    "goals":
+    [
+        "(examined panel_000)",
+        "(examined panel_001)"
+    ]
+
+}

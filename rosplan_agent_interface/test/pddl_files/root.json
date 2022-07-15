@@ -1,0 +1,26 @@
+{
+    "leak-alert": {
+        "domain_file": "./domains/survey.pddl",
+        "problem_templates": [
+            {
+                "name": "./templates/leak_failure_template.pddl",
+                "fluents": "./templates/survey_fluents.json",
+                "output": "./problems/survey_problem.pddl",
+                "cost": 10
+            }
+        ],
+        "goals": ["leak-found"]
+    },
+    "leak-found": {
+        "domain_file": "./domains/patch.pddl",
+        "problem_templates": [
+            {
+                "name": "./templates/leak_failure_template.pddl",
+                "fluents": "./templates/patch_fluents.json",
+                "output": "./problems/patch_problem.pddl",
+                "cost": 5
+            }
+        ],
+        "goals": []
+    }
+}

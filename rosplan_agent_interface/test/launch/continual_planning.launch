@@ -1,0 +1,74 @@
+<?xml version="1.0"?>
+<launch>
+
+	<!-- arguments -->
+	<arg name="pddl_file_path" default="$(find rosplan_agent_interface)/test/pddl_files"/>
+	<arg name="domain_path"	default="$(arg pddl_file_path)/domains/leak_failure.pddl" />
+	<arg name="problem_path"	default="$(arg pddl_file_path)/problems/leak_failure_problem.pddl" />
+
+	<!-- planner interface -->
+	<include file="$(find rosplan_planning_system)/launch/includes/planner_interface.launch">
+		<arg name="use_problem_topic"	value="false"/>
+		<arg name="planner_topic"		value="planner_output"/>
+		<arg name="data_path"			value="$(arg pddl_file_path)/plans"/>
+		<arg name="planner_command"		value="timeout 10 $(find rosplan_planning_system)/common/bin/popf DOMAIN PROBLEM"/>
+	</include>
+
+	<!-- Parsing -->
+	<node name="rosplan_parsing_interface" pkg="rosplan_planning_system" type="pddl_simple_plan_parser" respawn="false" output="screen">
+		<param name="knowledge_base"	value="rosplan_knowledge_base"/>
+		<param name="planner_topic"		value="/rosplan_planner_interface/planner_output"/>
+		<param name="plan_topic"		value="complete_plan"/>
+	</node>
+
+	<!-- Configurator -->
+	<include file="$(find rosplan_agent_interface)/launch/configurator_interface.launch">
+		<arg name="node_name"			value="rosplan_configurator_interface"/>
+		<arg name="goal_request_topic"	value="goals"/>
+		<arg name="problem_topic"		value="problems"/>
+		<arg name="planner"				value="$(find rosplan_planning_system)/common/bin/popf"/>
+		<arg name="pddl_file_path"		value="$(arg pddl_file_path)/"/>
+	</include>
+
+	<!-- KB -->
+	<node name="rosplan_knowledge_base" pkg="rosplan_knowledge_base" type="knowledgeBase" respawn="false" output="screen">
+		<param name="domain_path"	value="$(arg domain_path)"/>
+		<param name="problem_path"	value="$(arg problem_path)"/>
+		<!-- conditional planning flags -->
+		<param name="use_unknowns"	value="false"/>
+	</node>
+
+	<!-- Executive -->
+	<include file="$(find rosplan_agent_interface)/launch/executive_interface.launch">
+		<arg name="node_name"			value="rosplan_executive_interface"/>
+		<arg name="configurator_topic"	value="/rosplan_configurator_interface/output"/>
+		<arg name="dispatch_topic"		value="output"/>
+	</include>
+
+	<!-- Dispatch -->
+	<node name="rosplan_plan_dispatcher" pkg="rosplan_planning_system" type="pddl_simple_plan_dispatcher" respawn="false" output="screen">
+		<param name="knowledge_base"	value="rosplan_knowledge_base"/>
+		<param name="plan_topic"		value="/rosplan_executive_interface/output"/>
+		<param name="action_dispatch_topic"	value="action_dispatch"/>
+		<param name="action_feedback_topic"	value="action_feedback"/>
+	</node>
+
+	<!-- Simulated actions -->
+	<include file="$(find rosplan_planning_system)/launch/includes/simulated_action.launch">
+		<arg name="pddl_action_name" value="examine_panel"/>
+		<arg name="action_duration"  value="=10"/>
+	</include>
+	<include file="$(find rosplan_planning_system)/launch/includes/simulated_action.launch">
+		<arg name="pddl_action_name" value="do_hover_fast"/>
+		<arg name="action_duration"  value="20"/>
+	</include>
+	<include file="$(find rosplan_planning_system)/launch/includes/simulated_action.launch">
+		<arg name="pddl_action_name" value="correct_position"/>
+		<arg name="action_duration"  value="10"/>
+	</include>
+	<include file="$(find rosplan_planning_system)/launch/includes/simulated_action.launch">
+		<arg name="pddl_action_name" value="patch_leak"/>
+		<arg name="action_duration"  value="10"/>
+	</include>
+
+</launch>
