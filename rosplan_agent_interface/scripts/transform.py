@@ -53,6 +53,7 @@ def processFluents(file_in):
     data = json.load(json_file)
     json_file.close()
 
+    problem = data['problem']
     domain = data['domain']
     instances = data['instances']
     # resources = data['resources']
@@ -86,7 +87,7 @@ def processFluents(file_in):
                 predicates.append(line)
 
 
-    return domain,instances,predicates,goals
+    return problem,domain,instances,predicates,goals
 
 # def processStatics(file_in):
 #     f = open(file_in, 'r')
@@ -96,10 +97,10 @@ def processFluents(file_in):
 def transform(fluents_in, template_string):
     """ transforms the template; this function may be called from other Python code, e.g. Flask web service """
 
-    domain,instances,predicates,goals = processFluents(fluents_in)
+    problem,domain,instances,predicates,goals = processFluents(fluents_in)
     # statics = processStatics(statics_in)
     template = load_template_from_string(template_string)
-    transformed = template.render(domain=domain,instances=instances,predicates=predicates,goals=goals)
+    transformed = template.render(problem=problem,domain=domain,instances=instances,predicates=predicates,goals=goals)
     compacted = remove_doubled_whitespace(transformed)
     return compacted
 

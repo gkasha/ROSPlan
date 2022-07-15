@@ -1,4 +1,4 @@
-(define (problem leak_failure)
+(define (problem patch_problem)
 (:domain patch)
 (:objects
 leak_000 - leak
@@ -51,4 +51,4 @@ panel_000 panel_001 - panel
     
     (>= (leak_goal_completed leak_000) 1)
 )))
-;; This PDDL problem file was generated on 2022-07-15 10:59:08.015861
+;; This PDDL problem file was generated on 2022-07-15 11:05:15.060844

@@ -1,4 +1,4 @@
-(define (problem leak_failure)
+(define (problem survey_problem)
 (:domain survey)
 (:objects
 leak_000 - leak
@@ -47,4 +47,4 @@ panel_000 panel_001 - panel
     (examined panel_000)
     (examined panel_001)
 )))
-;; This PDDL problem file was generated on 2022-07-15 10:58:57.097121
+;; This PDDL problem file was generated on 2022-07-15 11:05:04.100789

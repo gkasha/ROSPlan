@@ -1,4 +1,4 @@
-(define (problem leak_failure)
+(define (problem {{problem}})
 (:domain {{domain}})
 (:objects
 {% for i in instances %}{% for v in instances[i] %}{{v}} {% endfor %}- {{i}}
