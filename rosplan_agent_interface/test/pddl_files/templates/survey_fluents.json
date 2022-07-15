@@ -1,12 +1,24 @@
 {
     "domain": "survey",
-    "resources":
-    [
-        {
-            "key": "v",
-            "value": "astrobee"
-        }
-    ],
+    "instances":
+    {
+        "robot": 
+        [
+            "astrobee"
+        ],
+        "panel":
+        [
+            "panel_000", "panel_001"
+        ],
+        "leak":
+        [
+            "leak_000"
+        ],
+        "waypoint":
+        [
+            "start_point_1", "loc_1", "loc_2", "end_point"
+        ]
+    },
     "predicates":
     [
         "at",

@@ -1,10 +1,8 @@
 (define (problem leak_failure)
 (:domain {{domain}})
 (:objects
-{% for r in resources['v'] %}{{r}} {% endfor %} - robot
-panel_000 panel_001 - panel
-leak_000 - leak
-start_point_1 loc_1 loc_2 end_point - Waypoint
+{% for i in instances %}{% for v in instances[i] %}{{v}} {% endfor %}- {{i}}
+{% endfor %}
 )
 (:init
 

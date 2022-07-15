@@ -1,10 +1,11 @@
 (define (problem leak_failure)
 (:domain patch)
 (:objects
-r2 astrobee  - robot
-panel_000 panel_001 - panel
 leak_000 - leak
-start_point_1 loc_1 loc_2 end_point - Waypoint
+start_point_1 loc_1 loc_2 end_point - waypoint
+r2 astrobee - robot
+panel_000 panel_001 - panel
+
 )
 (:init
 
@@ -50,4 +51,4 @@ start_point_1 loc_1 loc_2 end_point - Waypoint
     
     (>= (leak_goal_completed leak_000) 1)
 )))
-;; This PDDL problem file was generated on 2022-07-15 10:35:17.364724
+;; This PDDL problem file was generated on 2022-07-15 10:59:08.015861

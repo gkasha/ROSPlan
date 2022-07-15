@@ -1,16 +1,24 @@
 {
     "domain": "patch",
-    "resources":
-    [
-        {
-            "key": "v",
-            "value": "r2"
-        },
-        {
-            "key": "v",
-            "value": "astrobee"
-        }
-    ],
+    "instances":
+    {
+        "robot": 
+        [
+            "r2", "astrobee"
+        ],
+        "panel":
+        [
+            "panel_000", "panel_001"
+        ],
+        "leak":
+        [
+            "leak_000"
+        ],
+        "waypoint":
+        [
+            "start_point_1", "loc_1", "loc_2", "end_point"
+        ]
+    },
     "predicates":
     [
         "at",

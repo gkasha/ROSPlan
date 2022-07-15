@@ -54,18 +54,17 @@ def processFluents(file_in):
     json_file.close()
 
     domain = data['domain']
-    resources = data['resources']
+    instances = data['instances']
+    # resources = data['resources']
     raw_predicates = data['predicates']
     goals = data['goals']
     
     predicates = []
 
-    resources_dict = {}
-    for d in resources:
-        if d['key'] in resources_dict:
-            resources_dict[d['key']].append(d['value'])
-        else:
-            resources_dict[d['key']] = [d['value']]
+    instances_set = set()
+    for i in data['instances']:
+        for x in data['instances'][i]:
+            instances_set.add(x)
 
     for p in raw_predicates:
         # Construct query, get result
@@ -77,10 +76,9 @@ def processFluents(file_in):
             line = "(" + p
             for x in elt.values:
                 line += " " + x.value
-                if x.key in resources_dict:
-                    if not x.value in resources_dict[x.key]:
-                        match = False
-                        break
+                if not x.value in instances_set:
+                    match = False
+                    break
             if match:
                 line += ")"
                 if elt.is_negative:
@@ -88,7 +86,7 @@ def processFluents(file_in):
                 predicates.append(line)
 
 
-    return domain,resources_dict,predicates,goals
+    return domain,instances,predicates,goals
 
 # def processStatics(file_in):
 #     f = open(file_in, 'r')
@@ -98,10 +96,10 @@ def processFluents(file_in):
 def transform(fluents_in, template_string):
     """ transforms the template; this function may be called from other Python code, e.g. Flask web service """
 
-    domain,resources,predicates,goals = processFluents(fluents_in)
+    domain,instances,predicates,goals = processFluents(fluents_in)
     # statics = processStatics(statics_in)
     template = load_template_from_string(template_string)
-    transformed = template.render(domain=domain,resources=resources,predicates=predicates,goals=goals)
+    transformed = template.render(domain=domain,instances=instances,predicates=predicates,goals=goals)
     compacted = remove_doubled_whitespace(transformed)
     return compacted
 
