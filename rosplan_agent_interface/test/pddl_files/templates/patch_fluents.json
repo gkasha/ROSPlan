@@ -5,6 +5,10 @@
         {
             "key": "v",
             "value": "r2"
+        },
+        {
+            "key": "v",
+            "value": "astrobee"
         }
     ],
     "predicates":
@@ -12,10 +16,11 @@
         "at",
         "waypoint_not_occupied",
         "found",
-        "canexame",
+        "canexamine",
         "canreach",
         "leak_state",
-        "leak_goal_completed"
+        "leak_goal_completed",
+        "canfix"
     ],
     "goals":
     [

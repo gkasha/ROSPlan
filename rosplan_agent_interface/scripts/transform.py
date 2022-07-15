@@ -60,11 +60,15 @@ def processFluents(file_in):
     
     predicates = []
 
+    resources_dict = {}
+    for d in resources:
+        if d['key'] in resources_dict:
+            resources_dict[d['key']].append(d['value'])
+        else:
+            resources_dict[d['key']] = [d['value']]
+
     for p in raw_predicates:
         # Construct query, get result
-        key = resources[0]['key']
-        val = resources[0]['value']
-
         rep = callPropService(p)
         
         
@@ -73,8 +77,8 @@ def processFluents(file_in):
             line = "(" + p
             for x in elt.values:
                 line += " " + x.value
-                if x.key == key:
-                    if x.value != val:
+                if x.key in resources_dict:
+                    if not x.value in resources_dict[x.key]:
                         match = False
                         break
             if match:
@@ -84,7 +88,7 @@ def processFluents(file_in):
                 predicates.append(line)
 
 
-    return domain,resources,predicates,goals
+    return domain,resources_dict,predicates,goals
 
 # def processStatics(file_in):
 #     f = open(file_in, 'r')

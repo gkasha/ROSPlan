@@ -11,8 +11,8 @@ start_point_1 loc_1 loc_2 end_point - Waypoint
 (at r2 start_point_1)
 (at astrobee loc_1)
 
-(waypoint_not_occupied start_point_1)
-(waypoint_not_occupied loc_1)
+(not (waypoint_not_occupied start_point_1))
+(not (waypoint_not_occupied loc_1))
 (waypoint_not_occupied loc_2)
 (waypoint_not_occupied end_point)
 
@@ -28,6 +28,7 @@ start_point_1 loc_1 loc_2 end_point - Waypoint
 (canexamine r2 loc_2 panel_001)
 (canreach r2 loc_1 panel_000)
 (canreach r2 loc_2 panel_001)
+(canfix r2)
 
 (connected start_point_1 start_point_1)  (= (distance start_point_1 start_point_1) 0)
 (connected start_point_1 start_point_1)  (= (distance start_point_1 start_point_1) 0)

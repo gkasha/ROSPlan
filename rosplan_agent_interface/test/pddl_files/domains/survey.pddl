@@ -52,12 +52,12 @@
 	:duration ( = ?duration (* (distance ?from ?to) 2))
 	:condition (and
 				(at start (at ?v ?from)) 
-;;				(over all (waypoint_not_occupied ?to))
+				(over all (waypoint_not_occupied ?to))
 				(at start (connected ?from ?to)))
 	:effect (and 
 				(at start (not (at ?v ?from)))
-;;			    (at end (waypoint_not_occupied ?from))
-;;				(at end (not (waypoint_not_occupied ?to)))
+			    (at end (waypoint_not_occupied ?from))
+				(at end (not (waypoint_not_occupied ?to)))
 				(at end (at ?v ?to)))
 )
 
@@ -67,12 +67,12 @@
 	:duration ( = ?duration (* (distance ?from ?to) 1))
 	:condition (and
 				(at start (at ?v ?from))
-;;				(over all (waypoint_not_occupied ?to))
+				(over all (waypoint_not_occupied ?to))
 				(at start (connected ?from ?to)))
 	:effect (and
 				(at start (not (at ?v ?from)))
-;;				(at start (waypoint_not_occupied ?from))
-;;				(at end (not (waypoint_not_occupied ?to)))
+				(at start (waypoint_not_occupied ?from))
+				(at end (not (waypoint_not_occupied ?to)))
 				(at end (near ?v ?to)))
 )
 

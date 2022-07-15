@@ -1,7 +1,7 @@
 (define (problem leak_failure)
 (:domain survey)
 (:objects
-astrobee - robot
+astrobee  - robot
 panel_000 panel_001 - panel
 leak_000 - leak
 start_point_1 loc_1 loc_2 end_point - Waypoint
@@ -9,10 +9,10 @@ start_point_1 loc_1 loc_2 end_point - Waypoint
 (:init
 
 (at astrobee loc_1)
-(waypoint_not_occupied start_point_1)
-(waypoint_not_occupied loc_1)
 (waypoint_not_occupied loc_2)
 (waypoint_not_occupied end_point)
+(not (waypoint_not_occupied start_point_1))
+(not (waypoint_not_occupied loc_1))
 (not (found leak_000 panel_000))
 (not (found leak_000 panel_001))
 (canexamine astrobee loc_1 panel_000)
@@ -46,4 +46,4 @@ start_point_1 loc_1 loc_2 end_point - Waypoint
     (examined panel_000)
     (examined panel_001)
 )))
-;; This PDDL problem file was generated on 2022-07-15 09:33:23.022991
+;; This PDDL problem file was generated on 2022-07-15 10:35:06.497040

@@ -36,15 +36,6 @@ knowledge="$knowledge
       - {key: 'a', value: 'leak_000'}
       - {key: 'p', value: 'panel_000'}"
 
-update_type="$update_type
-    - 0";
-knowledge="$knowledge
-    - knowledge_type: 1
-      attribute_name: 'at'
-      values:
-        - {key: 'v', value: 'astrobee'}
-        - {key: 'wp', value: 'loc1'}
-      is_negative: True"
 
 rosservice call /rosplan_knowledge_base/update_array "
 $update_type
