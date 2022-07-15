@@ -9,17 +9,21 @@ panel_000 panel_001 - panel
 )
 (:init
 
-(at astrobee loc_1)
+(not (found leak_000 panel_000))
+(not (found leak_000 panel_001))
+
 (waypoint_not_occupied loc_2)
 (waypoint_not_occupied end_point)
 (not (waypoint_not_occupied start_point_1))
 (not (waypoint_not_occupied loc_1))
-(not (found leak_000 panel_000))
-(not (found leak_000 panel_001))
-(canexamine astrobee loc_1 panel_000)
-(canexamine astrobee loc_2 panel_001)
+
+(at astrobee loc_1)
+
 (canreach astrobee loc_1 panel_000)
 (canreach astrobee loc_2 panel_001)
+
+(canexamine astrobee loc_1 panel_000)
+(canexamine astrobee loc_2 panel_001)
 
 (connected start_point_1 start_point_1)  (= (distance start_point_1 start_point_1) 0)
 (connected start_point_1 start_point_1)  (= (distance start_point_1 start_point_1) 0)
@@ -47,4 +51,4 @@ panel_000 panel_001 - panel
     (examined panel_000)
     (examined panel_001)
 )))
-;; This PDDL problem file was generated on 2022-07-15 11:05:04.100789
+;; This PDDL problem file was generated on 2022-07-15 12:40:05.715918

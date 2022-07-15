@@ -60,7 +60,7 @@ def processFluents(file_in):
     raw_predicates = data['predicates']
     goals = data['goals']
     
-    predicates = []
+    predicates = {}
 
     instances_set = set()
     for i in data['instances']:
@@ -70,7 +70,7 @@ def processFluents(file_in):
     for p in raw_predicates:
         # Construct query, get result
         rep = callPropService(p)
-        
+        predicates[p] = []
         
         for elt in rep.attributes:
             match = True
@@ -84,7 +84,7 @@ def processFluents(file_in):
                 line += ")"
                 if elt.is_negative:
                     line = "(not " + line + ")"
-                predicates.append(line)
+                predicates[p].append(line)
 
 
     return problem,domain,instances,predicates,goals

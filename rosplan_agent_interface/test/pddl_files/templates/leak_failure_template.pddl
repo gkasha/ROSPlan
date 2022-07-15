@@ -6,8 +6,9 @@
 )
 (:init
 
-{% for p in predicates %}
-{{p}}{% endfor %}
+{% for p in predicates %}{% for v in predicates[p] %}
+{{v}}{% endfor %}
+{% endfor %}
 
 (connected start_point_1 start_point_1)  (= (distance start_point_1 start_point_1) 0)
 (connected start_point_1 start_point_1)  (= (distance start_point_1 start_point_1) 0)
