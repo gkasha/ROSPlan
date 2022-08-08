@@ -9,7 +9,7 @@
                 "cost": 10
             }
         ],
-        "goals": ["leak-found"]
+        "opportunities": ["leak-found"]
     },
     "leak-found": {
         "domain_file": "./domains/patch.pddl",
@@ -21,6 +21,6 @@
                 "cost": 5
             }
         ],
-        "goals": []
+        "opportunities": []
     }
 }

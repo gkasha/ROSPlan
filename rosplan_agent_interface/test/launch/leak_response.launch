@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<launch>
+    <arg name="pddl_file_path"  value="$(find rosplan_agent_interface)/test/leak_response"/>
+
+    <include file="$(find rosplan_agent_interface)/launch/continual_planning.launch">
+        <arg name="pddl_file_path"  value="$(arg pddl_file_path)"/>
+        <arg name="domain_path"     value="$(arg pddl_file_path)/domains/leak_failure.pddl"/>
+        <arg name="problem_path"    value="$(arg pddl_file_path)/problems/leak_failure_problem.pddl"/>
+    </include>
+
+	<!-- Simulated actions -->
+	<include file="$(find rosplan_planning_system)/launch/includes/simulated_action.launch">
+		<arg name="pddl_action_name" value="examine_panel"/>
+		<arg name="action_duration"  value="10"/>
+	</include>
+	<include file="$(find rosplan_planning_system)/launch/includes/simulated_action.launch">
+		<arg name="pddl_action_name" value="do_hover_fast"/>
+		<arg name="action_duration"  value="20"/>
+	</include>
+	<include file="$(find rosplan_planning_system)/launch/includes/simulated_action.launch">
+		<arg name="pddl_action_name" value="correct_position"/>
+		<arg name="action_duration"  value="10"/>
+	</include>
+	<include file="$(find rosplan_planning_system)/launch/includes/simulated_action.launch">
+		<arg name="pddl_action_name" value="patch_leak"/>
+		<arg name="action_duration"  value="10"/>
+	</include>
+
+</launch>

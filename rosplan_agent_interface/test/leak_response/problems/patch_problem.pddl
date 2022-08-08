@@ -56,4 +56,4 @@ panel_000 panel_001 - panel
     
     (>= (leak_goal_completed leak_000) 1)
 )))
-;; This PDDL problem file was generated on 2022-07-15 12:40:16.545405
+;; This PDDL problem file was generated on 2022-08-08 10:59:37.319045

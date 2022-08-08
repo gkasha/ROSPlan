@@ -1,0 +1,14 @@
+{
+    "transport-bag": {
+        "domain_file": "./domains/bag_transport.pddl",
+        "problem_templates":[
+            {
+                "name": "./templates/bag_transport_template.pddl",
+                "fluents": "./templates/bag_transport.json",
+                "output": "./problems/new_btp.pddl",
+                "cost": 10
+            }
+        ],
+        "opportunities": ["transport-bag"]
+    }
+}

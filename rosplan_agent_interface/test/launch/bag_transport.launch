@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<launch>
+    <arg name="pddl_file_path"  value="$(find rosplan_agent_interface)/test/bag_transport"/>
+
+    <include file="$(find rosplan_agent_interface)/launch/continual_planning.launch">
+        <arg name="pddl_file_path"  value="$(arg pddl_file_path)"/>
+        <arg name="domain_path"     value="$(arg pddl_file_path)/domains/bag_transport.pddl"/>
+        <arg name="problem_path"    value="$(arg pddl_file_path)/problems/bag_transport_problem.pddl"/>
+    </include>
+
+	<!-- Simulated actions -->
+	<include file="$(find rosplan_planning_system)/launch/includes/simulated_action.launch">
+		<arg name="pddl_action_name" value="move_to"/>
+		<arg name="action_duration"  value="15"/>
+	</include>
+	<include file="$(find rosplan_planning_system)/launch/includes/simulated_action.launch">
+		<arg name="pddl_action_name" value="pick_up"/>
+		<arg name="action_duration"  value="10"/>
+	</include>
+	<include file="$(find rosplan_planning_system)/launch/includes/simulated_action.launch">
+		<arg name="pddl_action_name" value="place"/>
+		<arg name="action_duration"  value="10"/>
+	</include>
+</launch>
