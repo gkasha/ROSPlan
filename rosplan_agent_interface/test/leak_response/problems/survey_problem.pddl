@@ -25,6 +25,8 @@ panel_000 panel_001 - panel
 (canexamine astrobee loc_1 panel_000)
 (canexamine astrobee loc_2 panel_001)
 
+;; statics 
+
 (connected start_point_1 start_point_1)  (= (distance start_point_1 start_point_1) 0)
 (connected start_point_1 start_point_1)  (= (distance start_point_1 start_point_1) 0)
 (connected start_point_1 loc_2)  (= (distance start_point_1 loc_2) 50.1498)
@@ -45,10 +47,12 @@ panel_000 panel_001 - panel
 (connected loc_2 end_point) (= (distance loc_2 end_point) 50)
 (connected end_point loc_2) (= (distance end_point loc_2) 50)
 
+;; end statics
+
 )
 (:goal (and
     
     (examined panel_000)
     (examined panel_001)
 )))
-;; This PDDL problem file was generated on 2022-08-08 10:59:26.358992
+;; This PDDL problem file was generated on 2022-08-11 11:05:38.566746

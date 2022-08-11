@@ -25,6 +25,7 @@
 #include "rosplan_dispatch_msgs/DispatchService.h"
 #include "rosplan_knowledge_msgs/KnowledgeItem.h"
 #include "rosplan_knowledge_msgs/KnowledgeQueryService.h"
+#include "rosplan_knowledge_msgs/KnowledgeUpdateService.h"
 #include "rosplan_knowledge_msgs/GetAttributeService.h"
 #include "std_srvs/Empty.h"
 

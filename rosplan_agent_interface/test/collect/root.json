@@ -1,0 +1,26 @@
+{
+    "collect-documents": {
+        "domain_file": "./domains/collect.pddl",
+        "problem_templates": [
+            {
+                "name": "./templates/collect_template.pddl",
+                "fluents": "./templates/collect_fluents.json",
+                "output": "./problems/new_collect_problem.pddl",
+                "cost": 10
+            }
+        ],
+        "opportunities": ["holding_key"]
+    },
+    "holding_key": {
+        "domain_file": "./domains/collect_with_key.pddl",
+        "problem_templates": [
+            {
+                "name": "./templates/collect_template.pddl",
+                "fluents": "./templates/collect_with_key_fluents.json",
+                "output": "./problems/collect_with_key_problem.pddl",
+                "cost": 5
+            }
+        ],
+        "opportunities": []
+    }
+}

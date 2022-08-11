@@ -1,2 +1,2 @@
 string plan_topic
-string[] goals
+string[] opportunities

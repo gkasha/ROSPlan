@@ -1,0 +1,22 @@
+
+; Version LPG-td-1.4
+; Seed 26729516
+; Command line: ./lpg-td -o /home/gkasha/Documents/continual_planning/ROSPlan/src/ROSPlan/rosplan_agent_interface/test/collect/domains/collect.pddl -f /home/gkasha/Documents/continual_planning/ROSPlan/src/ROSPlan/rosplan_agent_interface/test/collect/problems/new_collect_problem.pddl -n 1 
+; Problem /home/gkasha/Documents/continual_planning/ROSPlan/src/ROSPlan/rosplan_agent_interface/test/collect/problems
+; Time 0.03
+; Search time 0.03
+; Parsing time 0.00
+; Mutex time 0.00
+; MetricValue 9.00
+
+0.0002:   (GOTO_ROOM ASTROBEE R0 R1) [30.0000]
+30.0005:   (PICKUP_DOC ASTROBEE DOC1 R1) [30.0000]
+60.0010:   (GOTO_ROOM ASTROBEE R1 R2) [30.0000]
+90.0013:   (GOTO_ROOM ASTROBEE R2 R3) [30.0000]
+120.0015:   (GOTO_ROOM ASTROBEE R3 R2) [30.0000]
+150.0017:   (GOTO_ROOM ASTROBEE R2 R3) [30.0000]
+180.0020:   (GOTO_ROOM ASTROBEE R3 R2) [30.0000]
+210.0022:   (GOTO_ROOM ASTROBEE R2 R3) [30.0000]
+240.0025:   (PICKUP_DOC ASTROBEE DOC2 R3) [30.0000]
+
+

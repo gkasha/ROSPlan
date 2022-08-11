@@ -1,0 +1,28 @@
+{
+    "problem": "collect_with_key_problem",
+    "domain": "collect_with_key",
+    "instances": {
+        "room": [
+            "r0", "r1", "r2", "r3"
+        ],
+        "robot": [
+            "astrobee"
+        ],
+        "case": [
+            "case1"
+        ],
+        "key": [
+            "key1"
+        ],
+        "document": [
+            "doc1", "doc2"
+        ]
+    },
+    "predicates": [
+        "in", "at", "connected", "holding_case", "holding_key", "busy", "holding_doc"
+    ],
+    "goals": [
+        "(collected)"
+    ]
+    
+}

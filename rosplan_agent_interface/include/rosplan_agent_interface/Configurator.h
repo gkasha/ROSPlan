@@ -13,6 +13,7 @@
 #include <array>
 #include <vector>
 #include <sstream>
+#include <regex>
 
 #include "ros/ros.h"
 #include "rosplan_dispatch_msgs/ActionDispatch.h"
@@ -45,13 +46,13 @@ namespace KCL_rosplan
 
         void getCurrentState();
         std::string genProblemFile(std::string goal);
+        std::string genPlanFile(std::string domain_file, std::string problem_file);
 
 
     public:
         Configurator(ros::NodeHandle& nh, std::string pddl_files, std::string scripts, std::string planner, std::string output);
         ~Configurator();
         
-        void goalRequestCallback(const rosplan_dispatch_msgs::ActionDispatch msg);
         bool configure(rosplan_dispatch_msgs::ConfigureService::Request &req,
                        rosplan_dispatch_msgs::ConfigureService::Response &res);
     };

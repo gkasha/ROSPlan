@@ -65,7 +65,7 @@ def processFluents(file_in):
     instances_set = set()
     for i in data['instances']:
         for x in data['instances'][i]:
-            instances_set.add(x)
+            instances_set.add(x.lower())
 
     for p in raw_predicates:
         # Construct query, get result
@@ -120,13 +120,13 @@ def main(args):
     data = processJson(filename)
 
     if not goal in data:
-        # print("Goal not reachable from root")
+        print("Goal not reachable from root")
         return
 
     v = data[goal]
     domain_file = pddl_files + v['domain_file']
     problem_template = min(v['problem_templates'], key=lambda f : f['cost'])
-    goals = v['goals']
+    opportunities = v['opportunities']
 
     # Get args
     fluents_file = pddl_files + problem_template['fluents']
@@ -140,7 +140,7 @@ def main(args):
     with open (output_file, 'w') as f:
         f.write(transformed)
         f.write("\n;; This PDDL problem file was generated on " +  str(datetime.datetime.now()))
-    print(domain_file + " " + output_file + " " + " ".join(goals))
+    print(domain_file + " " + output_file + " " + " ".join(opportunities))
 
 if __name__ == "__main__":
     main(sys.argv[1:])

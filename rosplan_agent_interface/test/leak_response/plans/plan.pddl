@@ -1,16 +1,23 @@
-;;Number of literals: 25
-Constructing lookup tables: [10%] [20%] [30%] [40%] [50%] [60%] [70%] [80%] [90%] [100%]
-Post filtering unreachable actions:  [10%] [20%] [30%] [40%] [50%] [60%] [70%] [80%] [90%] [100%]
-Have identified that smaller values of (arm_calibration r2) are preferable
-Have identified that bigger values of (leak_goal_completed leak_000) are preferable
+;;Number of literals: 16
+Constructing lookup tables: [10%] [20%] [30%] [40%] [50%] [60%] [70%] [80%] [90%] [100%] [110%] [120%] [130%]
+Post filtering unreachable actions:  [10%] [20%] [30%] [40%] [50%] [60%] [70%] [80%] [90%] [100%] [110%] [120%] [130%]
 [01;34mNo analytic limits found, not considering limit effects of goal-only operators[00m
-97% of the ground temporal actions in this problem are compression-safe
-Initial heuristic = 5.000
-b (4.000 | 50.000)b (3.000 | 50.151)b (2.000 | 53.152);;;; Solution Found
+Pruning (do_hover_controlled astrobee start_point_1 loc_1) - never appeared in initial RPG
+Pruning (do_hover_controlled astrobee start_point_1 loc_2) - never appeared in initial RPG
+Pruning (do_hover_controlled astrobee loc_1 start_point_1) - never appeared in initial RPG
+Pruning (do_hover_controlled astrobee loc_2 start_point_1) - never appeared in initial RPG
+Pruning (do_hover_fast astrobee start_point_1 loc_1) - never appeared in initial RPG
+Pruning (do_hover_fast astrobee start_point_1 loc_2) - never appeared in initial RPG
+Pruning (do_hover_fast astrobee loc_1 start_point_1) - never appeared in initial RPG
+Pruning (do_hover_fast astrobee loc_2 start_point_1) - never appeared in initial RPG
+Pruning (correct_position astrobee start_point_1) - never appeared in initial RPG
+All the ground actions in this problem are compression-safe
+Initial heuristic = 4.000
+b (3.000 | 10.000)b (2.000 | 90.001)b (1.000 | 93.002);;;; Solution Found
 ; States evaluated: 6
-; Cost: 173.153
+; Cost: 103.003
 ; Time 0.00
-0.000: (do_hover_fast astrobee loc_1 end_point)  [50.000]
-0.001: (do_hover_fast r2 start_point_1 loc_1)  [50.150]
-50.152: (correct_position r2 loc_1)  [3.000]
-53.153: (patch_leak r2 loc_1 panel_000 leak_000)  [120.000]
+0.000: (examine_panel astrobee loc_1 panel_000)  [10.000]
+0.001: (do_hover_fast astrobee loc_1 loc_2)  [90.000]
+90.002: (correct_position astrobee loc_2)  [3.000]
+93.003: (examine_panel astrobee loc_2 panel_001)  [10.000]

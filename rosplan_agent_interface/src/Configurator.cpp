@@ -55,7 +55,7 @@ namespace KCL_rosplan {
      * not exist
      */
     std::string Configurator::genProblemFile(std::string goal) {
-
+        ROS_INFO("GENERATING PROBLEM FILE");
         // Finally, call transform.py to generate problem file
         // This will query the KB based on the fluents file, and then fill in
         // information from both the fixed and fluents
@@ -64,6 +64,19 @@ namespace KCL_rosplan {
         return exec(command.c_str());
     }
 
+    std::string Configurator::genPlanFile(std::string domain_file, std::string problem_file) {
+        ROS_INFO("GENERATING PLAN FILE");
+        // Invoke planner on problem and domain file
+        std::string temp = std::regex_replace(planner_, std::regex("DOMAIN"), domain_file);
+        std::string command = std::regex_replace(temp, std::regex("PROBLEM"), problem_file);
+        exec(command.c_str());
+
+        // Modify plan for parser
+        std::string plan_file = pddl_files_ + "/plans/plan.pddl";
+        command = "python3 " + scripts_ + "formatPlan.py " + plan_file;
+        exec(command.c_str());
+        return plan_file;
+    }
 
     bool Configurator::configure(rosplan_dispatch_msgs::ConfigureService::Request &req,
                                  rosplan_dispatch_msgs::ConfigureService::Response &res) {
@@ -76,45 +89,24 @@ namespace KCL_rosplan {
         std::vector<std::string> probresp = split(genProblemFile(req.goal), ' ');
         std::string domain_file = probresp[0];
         std::string problem_file = probresp[1];
-        std::vector<std::string> goals(probresp.begin() + 2, probresp.end());
+        std::vector<std::string> opportunities(probresp.begin() + 2, probresp.end());
         problem_file.erase(std::remove(problem_file.begin(), problem_file.end(), '\n'), problem_file.end());
 
         // Generate plan
-        rosplan_dispatch_msgs::PlanningService srv;
-        srv.request.domain_path = domain_file;
-        srv.request.problem_path = problem_file;
-        srv.request.data_path = pddl_files_ + "plans/";
-        srv.request.planner_command = "timeout 10 " + planner_ + " DOMAIN PROBLEM";
-        srv.request.use_problem_topic = false;
-
-        ros::ServiceClient client = node_handle_->serviceClient<rosplan_dispatch_msgs::PlanningService>("/rosplan_planner_interface/planning_server_params");
-        if (client.call(srv)) {
-            ROS_INFO("Plan found: %d", srv.response.plan_found);
-        } else {
-            ROS_ERROR("Failed to call planning service");
-            return false;
-        }
-
+        std::string plan = genPlanFile(domain_file, problem_file);
+        
         // Publish plan, send it to Executive
+        ROS_INFO("PUBLISHING PLAN");
         rosplan_dispatch_msgs::ConfigureReq msg;
-        msg.plan_topic = srv.request.data_path + "plan.pddl";//"/rosplan_planner_interface/planner_output";
-        for (std::string g : goals) {
-            g.erase(std::remove(g.begin(), g.end(), '\n'), g.end());
-            msg.goals.push_back(g);
+        msg.plan_topic = plan;//"/rosplan_planner_interface/planner_output";
+        for (std::string o : opportunities) {
+            o.erase(std::remove(o.begin(), o.end(), '\n'), o.end());
+            msg.opportunities.push_back(o);
         }
 
         configure_pub_.publish(msg);
         ROS_INFO("SENT MESSAGE TO EXECUTIVE: %s", msg.plan_topic.c_str());
         return true;
-    }
-
-    void Configurator::goalRequestCallback(const rosplan_dispatch_msgs::ActionDispatch msg) {
-        // ROS_INFO("KCL: (%s) Goal received.", ros::this_node::getName().c_str());
-        
-        // mission_start_time = ros::WallTime::now.toSec();
-        // current_goal_ = msg;
-
-        // Configurator::configure();
     }
 
 } // close namespace
@@ -135,11 +127,6 @@ namespace KCL_rosplan {
 
         KCL_rosplan::Configurator config(nh, pddl_files, scripts, planner, output);
         
-        // Subscribe to receive goals
-        std::string goalRequestTopic = "goalRequest";
-        nh.getParam("goal_request_topic", goalRequestTopic);
-        ros::Subscriber goal_sub = nh.subscribe(goalRequestTopic, 1000, &KCL_rosplan::Configurator::goalRequestCallback, &config);
-
         ROS_INFO("KCL: (%s) Ready to receive", ros::this_node::getName().c_str());
         
         // Advertise service

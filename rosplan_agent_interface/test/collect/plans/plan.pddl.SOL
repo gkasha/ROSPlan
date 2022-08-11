@@ -1,0 +1,15 @@
+
+; Version LPG-td-1.4
+; Seed 26592637
+; Command line: /home/gkasha/Documents/continual_planning/ROSPlan/src/ROSPlan/rosplan_planning_system/common/bin/lpg-td -o /home/gkasha/Documents/continual_planning/ROSPlan/src/ROSPlan/rosplan_agent_interface/test/collect/./domains/collect_with_key.pddl -f /home/gkasha/Documents/continual_planning/ROSPlan/src/ROSPlan/rosplan_agent_interface/test/collect/./problems/collect_with_key_problem.pddl -quality -out /home/gkasha/Documents/continual_planning/ROSPlan/src/ROSPlan/rosplan_agent_interface/test/collect/plans/plan.pddl 
+; Problem /home/gkasha/Documents/continual_planning/ROSPlan/src/ROSPlan/rosplan_agent_interface/test/collect/./problems/collect_with_key_problem.pddl
+; Time 0.26
+; Plan generation time 0.01
+; Search time 0.01
+; Parsing time 0.00
+; Mutex time 0.00
+; MetricValue 1.00
+
+0.0003:   (COLLECT_ALL_WITH_KEY ASTROBEE CASE1 KEY1) [30.0000]
+
+
