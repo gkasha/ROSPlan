@@ -1,11 +1,11 @@
 <?xml version="1.0"?>
 <launch>
-    <arg name="pddl_file_path"  value="$(find rosplan_agent_interface)/test/collect"/>
+    <arg name="pddl_file_path"  value="$(find rosplan_agent_interface)/test/collect/"/>
 
     <include file="$(find rosplan_agent_interface)/launch/continual_planning.launch">
         <arg name="pddl_file_path"  value="$(arg pddl_file_path)"/>
-        <arg name="domain_path"     value="$(arg pddl_file_path)/domains/collect.pddl"/>
-        <arg name="problem_path"    value="$(arg pddl_file_path)/problems/collect_problem.pddl"/>
+        <arg name="domain_path"     value="$(arg pddl_file_path)domains/collect.pddl"/>
+        <arg name="problem_path"    value="$(arg pddl_file_path)problems/collect_problem.pddl"/>
 		<arg name="planner_command"	value="$(find rosplan_planning_system)/common/bin/lpg-td -o DOMAIN -f PROBLEM -quality -out $(arg pddl_file_path)/plans/plan.pddl" />
     </include>
 

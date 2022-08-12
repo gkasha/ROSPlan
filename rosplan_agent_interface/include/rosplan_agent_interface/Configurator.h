@@ -26,31 +26,22 @@ namespace KCL_rosplan
     class Configurator
     {
     private:
+        ros::Publisher configure_pub_;
+        ros::NodeHandle* node_handle_;
+
         std::string pddl_files_;
         std::string scripts_;
-        std::string planner_;
+        std::string planner_command_;
         std::string output_;
-        std::string configurator_;
-        std::string knowledge_base_;
-        std::string executive_;
-        std::string dispatcher_;
 
         bool running_;
 
-        ros::Publisher configure_pub_;
-
-        double mission_start_time_;
-        rosplan_dispatch_msgs::ActionDispatch current_goal_;
-
-        ros::NodeHandle* node_handle_;
-
         void getCurrentState();
-        std::string genProblemFile(std::string goal);
+        std::vector<std::string> genProblemFile(std::string goal);
         std::string genPlanFile(std::string domain_file, std::string problem_file);
 
-
     public:
-        Configurator(ros::NodeHandle& nh, std::string pddl_files, std::string scripts, std::string planner, std::string output);
+        Configurator(ros::NodeHandle& nh, std::string pddl_files, std::string scripts, std::string planner_command, std::string output);
         ~Configurator();
         
         bool configure(rosplan_dispatch_msgs::ConfigureService::Request &req,

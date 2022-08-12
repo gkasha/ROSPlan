@@ -3,12 +3,12 @@
 namespace KCL_rosplan {
 
     Configurator::Configurator(ros::NodeHandle& nh, std::string pddl_files,
-                               std::string scripts, std::string planner, std::string output) {
+                               std::string scripts, std::string planner_command, std::string output) {
         node_handle_ = &nh;
         configure_pub_ = node_handle_->advertise<rosplan_dispatch_msgs::ConfigureReq>(output, 1);
         pddl_files_ = pddl_files;
         scripts_ = scripts;
-        planner_ = planner;
+        planner_command_ = planner_command;
         output_ = output;
         running_ = false;
     }
@@ -54,30 +54,38 @@ namespace KCL_rosplan {
      * This also intializes the KB, dispatcher, and Executive if they do
      * not exist
      */
-    std::string Configurator::genProblemFile(std::string goal) {
+    std::vector<std::string> Configurator::genProblemFile(std::string goal) {
         ROS_INFO("GENERATING PROBLEM FILE");
         // Finally, call transform.py to generate problem file
         // This will query the KB based on the fluents file, and then fill in
         // information from both the fixed and fluents
         std::string command = "python " + scripts_ + "transform.py " + pddl_files_ + " " + goal;
         running_ = true;
-        return exec(command.c_str());
+        
+        return split(exec(command.c_str()), ' ');
     }
 
+    /*
+     * Call planner on input domain and problem file
+     */
     std::string Configurator::genPlanFile(std::string domain_file, std::string problem_file) {
         ROS_INFO("GENERATING PLAN FILE");
         // Invoke planner on problem and domain file
-        std::string temp = std::regex_replace(planner_, std::regex("DOMAIN"), domain_file);
+        std::string temp = std::regex_replace(planner_command_, std::regex("DOMAIN"), domain_file);
         std::string command = std::regex_replace(temp, std::regex("PROBLEM"), problem_file);
         exec(command.c_str());
 
         // Modify plan for parser
-        std::string plan_file = pddl_files_ + "/plans/plan.pddl";
+        std::string plan_file = pddl_files_ + "plans/plan.pddl";
         command = "python3 " + scripts_ + "formatPlan.py " + plan_file;
         exec(command.c_str());
         return plan_file;
     }
 
+    /*
+     * Callback for configure requests. Generates problem and plan files, then sends plan and
+     * opportunities to Executive
+     */
     bool Configurator::configure(rosplan_dispatch_msgs::ConfigureService::Request &req,
                                  rosplan_dispatch_msgs::ConfigureService::Response &res) {
         ROS_INFO("KCL: (%s) RECEIVED CALL TO CONFIGURE", ros::this_node::getName().c_str());
@@ -86,7 +94,7 @@ namespace KCL_rosplan {
 
         
         // Get domain file and generate problem file
-        std::vector<std::string> probresp = split(genProblemFile(req.goal), ' ');
+        std::vector<std::string> probresp = genProblemFile(req.goal);
         std::string domain_file = probresp[0];
         std::string problem_file = probresp[1];
         std::vector<std::string> opportunities(probresp.begin() + 2, probresp.end());
@@ -98,7 +106,7 @@ namespace KCL_rosplan {
         // Publish plan, send it to Executive
         ROS_INFO("PUBLISHING PLAN");
         rosplan_dispatch_msgs::ConfigureReq msg;
-        msg.plan_topic = plan;//"/rosplan_planner_interface/planner_output";
+        msg.plan_topic = plan;
         for (std::string o : opportunities) {
             o.erase(std::remove(o.begin(), o.end(), '\n'), o.end());
             msg.opportunities.push_back(o);
@@ -119,13 +127,13 @@ namespace KCL_rosplan {
         ros::NodeHandle nh("~");
 
         // Get Configurator Info
-        std::string pddl_files, scripts, planner, output;
+        std::string pddl_files, scripts, planner_command, output;
         nh.getParam("pddl_file_path", pddl_files);
         nh.getParam("scripts_path", scripts);
-        nh.getParam("planner", planner);
+        nh.getParam("planner_command", planner_command);
         nh.getParam("output", output);
 
-        KCL_rosplan::Configurator config(nh, pddl_files, scripts, planner, output);
+        KCL_rosplan::Configurator config(nh, pddl_files, scripts, planner_command, output);
         
         ROS_INFO("KCL: (%s) Ready to receive", ros::this_node::getName().c_str());
         

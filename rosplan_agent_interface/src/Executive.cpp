@@ -13,10 +13,6 @@ namespace KCL_rosplan {
 
     }
 
-    void callService(ros::ServiceClient client, const rosplan_dispatch_msgs::CompletePlan plan) {
-        // Now want to dispatch plan
-        
-    }
     /*
      * We have the Executive first receive the plan, then send
      * it to the dispatcher, because we may need to do some
@@ -38,6 +34,9 @@ namespace KCL_rosplan {
         
     }
 
+    /*
+     * Monitors execution for emergence of opportunities
+     */
     std::string Executive::monitorExecution(std::vector<std::string> opportunities) {
         ros::Rate loop_rate(5);
 
@@ -69,6 +68,9 @@ namespace KCL_rosplan {
         }
     }
 
+    /*
+     * Callback to receive dispatch requests from configurator
+     */
     void Executive::configureCallback(const rosplan_dispatch_msgs::ConfigureReq msg) {
         ROS_INFO("RECEIVED CONFIGURE REQUEST");
         std::string plan_topic = msg.plan_topic;
@@ -128,8 +130,6 @@ namespace KCL_rosplan {
                 ROS_INFO("UNABLE TO POST NEW GOAL: %s", new_goal.c_str());
                 return;
             }
-        } else {
-            // Something unexpected happened, how should we handle it?
         }
         return;
         

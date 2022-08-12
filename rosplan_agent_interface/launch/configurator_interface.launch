@@ -6,7 +6,7 @@
     <arg name="goal_request_topic"          default=""/>
     <arg name="problem_topic"               default=""/>
     <arg name="pddl_file_path"              default=""/>
-    <arg name="planner"                     default="$(find rosplan_planning_system)/common/bin/popf"/>
+    <arg name="planner_command"             default="$(find rosplan_planning_system)/common/bin/lpg-td -o DOMAIN -f PROBLEM -quality -out $(arg pddl_file_path)/plans/plan.pddl"/>
     <arg name="scripts_path"                default="$(find rosplan_agent_interface)/scripts/"/>
     <arg name="output"                      default="output"/>
 
@@ -22,7 +22,7 @@
         <!-- directory for files -->
         <param name="pddl_file_path"            value="$(arg pddl_file_path)"/>
         <param name="scripts_path"              value="$(arg scripts_path)"/>
-        <param name="planner"                   value="$(arg planner)"/>
+        <param name="planner_command"           value="$(arg planner_command)"/>
         <param name="output"                    value="$(arg output)"/>
         <!-- to run the configurator -->
     </node>
