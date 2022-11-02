@@ -27,6 +27,20 @@ namespace KCL_rosplan {
 
         if (client.call(srv)) {
             ROS_INFO("Dispatcher was called, success: %d, goal_achieved: %d", srv.response.success, srv.response.goal_achieved);
+            if (!srv.response.success) {
+                rosplan_knowledge_msgs::KnowledgeUpdateService k_srv;
+                k_srv.request.update_type = 0;
+                k_srv.request.knowledge.knowledge_type = 1;
+                k_srv.request.knowledge.attribute_name = "dispatch-failure";
+                k_srv.request.knowledge.is_negative = false;
+                ros::ServiceClient client = node_handle_->serviceClient<rosplan_knowledge_msgs::KnowledgeUpdateService>("/rosplan_knowledge_base/update");
+                if (client.call(k_srv)) {
+                    ROS_INFO("Signaled dispatch failure");
+                } else {
+                    ROS_INFO("Unable to signal dispatch failure");
+                }
+                return;
+            }
         } else {
             ROS_INFO("Failed to call dispatcher service");
             return;
@@ -50,16 +64,21 @@ namespace KCL_rosplan {
                 if (k_client.call(k_srv)) {
                     for (auto attribute : k_srv.response.attributes) {
                         if (attribute.is_negative == false) {
-                            ROS_INFO("\n ---------------\nGOAL FOUND: %s\n ---------------\n", o.c_str());
-                            // Cancel dispatch
-                            std_srvs::Empty cancel_dispatch;
-                            ros::ServiceClient cancel_client = node_handle_->serviceClient<std_srvs::Empty>("/rosplan_plan_dispatcher/cancel_dispatch");
-                            if (cancel_client.call(cancel_dispatch)) {
-                                ROS_INFO("DISPATCH CANCELLED");
-                                return o;
-                            } else {
-                                ROS_INFO("Unable to cancel dispatch");
+                            if (o == "dispatch-failure") {
+                                ROS_INFO("FAILURE");
                                 return "";
+                            } else {
+                                ROS_INFO("\n ---------------\nGOAL FOUND: %s\n ---------------\n", o.c_str());
+                                // Cancel dispatch
+                                std_srvs::Empty cancel_dispatch;
+                                ros::ServiceClient cancel_client = node_handle_->serviceClient<std_srvs::Empty>("/rosplan_plan_dispatcher/cancel_dispatch");
+                                if (cancel_client.call(cancel_dispatch)) {
+                                    ROS_INFO("DISPATCH CANCELLED");
+                                    return o;
+                                } else {
+                                    ROS_INFO("Unable to cancel dispatch");
+                                    return "";
+                                }
                             }
                         }
                     }
@@ -81,6 +100,8 @@ namespace KCL_rosplan {
             opportunities.push_back(o);
             ROS_INFO("Opportunity: %s", o.c_str());
         }
+
+        opportunities.push_back("dispatch-failure");
         
         // Received plan topic, now want to invoke plan parser
         rosplan_dispatch_msgs::ParsingService parse_srv;
@@ -101,11 +122,11 @@ namespace KCL_rosplan {
         ros::AsyncSpinner spinner(2, &dispatch_queue);
         // Get plan from planner
         ros::Subscriber sub = nh_dispatch.subscribe("/rosplan_parsing_interface/complete_plan", 1, &KCL_rosplan::Executive::planCallback, this);
-        
         // Monitor execution for opportunities
         spinner.start();
         std::string new_goal = monitorExecution(opportunities);
         spinner.stop();
+        ROS_INFO("MONITOR EXECUTION DONE");
 
         if (new_goal != "") {
             // Achieved a goal, now want to post new goal to Configurator
@@ -119,6 +140,29 @@ namespace KCL_rosplan {
                 k_srv.request.update_type = 2;
                 k_srv.request.knowledge.knowledge_type = 1;
                 k_srv.request.knowledge.attribute_name = new_goal;
+                ros::ServiceClient client = node_handle_->serviceClient<rosplan_knowledge_msgs::KnowledgeUpdateService>("/rosplan_knowledge_base/update");
+                if (client.call(k_srv)) {
+                    ROS_INFO("Cleared goal from KB: %s", new_goal.c_str());
+                } else {
+                    ROS_INFO("Unable to clear goal from KB: %s", new_goal.c_str());
+                }
+                return;
+            } else {
+                ROS_INFO("UNABLE TO POST NEW GOAL: %s", new_goal.c_str());
+                return;
+            }
+        } else {
+            // Dispatch resulted in failure, need to restart
+            client = node_handle_->serviceClient<rosplan_dispatch_msgs::ConfigureService>("/rosplan_configurator_interface/configure");
+            rosplan_dispatch_msgs::ConfigureService configure_srv;
+            configure_srv.request.goal = msg.input_goal;
+            if (client.call(configure_srv)) {
+                ROS_INFO("POSTED NEW GOAL: %s", new_goal.c_str());
+
+                rosplan_knowledge_msgs::KnowledgeUpdateService k_srv;
+                k_srv.request.update_type = 2;
+                k_srv.request.knowledge.knowledge_type = 1;
+                k_srv.request.knowledge.attribute_name = "dispatch-failure";
                 ros::ServiceClient client = node_handle_->serviceClient<rosplan_knowledge_msgs::KnowledgeUpdateService>("/rosplan_knowledge_base/update");
                 if (client.call(k_srv)) {
                     ROS_INFO("Cleared goal from KB: %s", new_goal.c_str());

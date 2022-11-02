@@ -1,17 +1,19 @@
 
 ; Version LPG-td-1.4
-; Seed 31953314
-; Command line: /home/gkasha/Documents/continual_planning/ROSPlan/src/ROSPlan/rosplan_planning_system/common/bin/lpg-td -o /home/gkasha/Documents/continual_planning/ROSPlan/src/ROSPlan/rosplan_agent_interface/test/leak_response/./domains/patch.pddl -f /home/gkasha/Documents/continual_planning/ROSPlan/src/ROSPlan/rosplan_agent_interface/test/leak_response/./problems/patch_problem.pddl -quality -out /home/gkasha/Documents/continual_planning/ROSPlan/src/ROSPlan/rosplan_agent_interface/test/leak_response//plans/plan.pddl 
-; Problem /home/gkasha/Documents/continual_planning/ROSPlan/src/ROSPlan/rosplan_agent_interface/test/leak_response/./problems/patch_problem.pddl
-; Time 0.51
-; Plan generation time 0.02
-; Search time 0.02
+; Seed 57430604
+; Command line: /home/gkasha/Documents/continual_planning/ROSPlan/src/ROSPlan/rosplan_planning_system/common/bin/lpg-td -o /home/gkasha/Documents/continual_planning/ROSPlan/src/ROSPlan/rosplan_agent_interface/test/leak_response/./domains/survey.pddl -f /home/gkasha/Documents/continual_planning/ROSPlan/src/ROSPlan/rosplan_agent_interface/test/leak_response/./problems/survey_problem.pddl -quality -out /home/gkasha/Documents/continual_planning/ROSPlan/src/ROSPlan/rosplan_agent_interface/test/leak_response//plans/plan.pddl 
+; Problem /home/gkasha/Documents/continual_planning/ROSPlan/src/ROSPlan/rosplan_agent_interface/test/leak_response/./problems/survey_problem.pddl
+; Time 0.26
+; Plan generation time 0.01
+; Search time 0.01
 ; Parsing time 0.00
 ; Mutex time 0.00
-; MetricValue 3.00
+; MetricValue 5.00
 
-0.0003:   (DO_HOVER_FAST ASTROBEE LOC_1 LOC_2) [90.0000]
-0.0005:   (DO_HOVER_CONTROLLED R2 START_POINT_1 LOC_1) [100.2996]
-100.3003:   (PATCH_LEAK R2 LOC_1 PANEL_000 LEAK_000) [120.0000]
+0.0003:   (DO_HOVER_CONTROLLED R2 START_POINT_1 LOC_1) [100.2996]
+100.3001:   (EXAMINE_PANEL R2 LOC_1 PANEL_000) [10.0000]
+100.3003:   (DO_HOVER_FAST ASTROBEE LOC_2 START_POINT_1) [50.1498]
+100.3006:   (DO_HOVER_CONTROLLED R2 LOC_1 LOC_2) [180.0000]
+280.3008:   (EXAMINE_PANEL R2 LOC_2 PANEL_001) [10.0000]
 
 

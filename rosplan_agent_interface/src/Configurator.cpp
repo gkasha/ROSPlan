@@ -77,7 +77,7 @@ namespace KCL_rosplan {
 
         // Modify plan for parser
         std::string plan_file = pddl_files_ + "plans/plan.pddl";
-        command = "python3 " + scripts_ + "formatPlan.py " + plan_file;
+        command = "python " + scripts_ + "formatPlan.py " + plan_file;
         exec(command.c_str());
         return plan_file;
     }
@@ -107,6 +107,7 @@ namespace KCL_rosplan {
         ROS_INFO("PUBLISHING PLAN");
         rosplan_dispatch_msgs::ConfigureReq msg;
         msg.plan_topic = plan;
+        msg.input_goal = req.goal;
         for (std::string o : opportunities) {
             o.erase(std::remove(o.begin(), o.end(), '\n'), o.end());
             msg.opportunities.push_back(o);

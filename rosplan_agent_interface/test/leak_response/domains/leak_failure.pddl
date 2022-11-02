@@ -11,7 +11,8 @@
 		robot)
 
 (:predicates
-
+	(dispatch-failure)
+	
 	(waypoint_not_occupied ?wp - waypoint)
 	(connected ?wp1 ?wp2 - waypoint)
 

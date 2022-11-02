@@ -3,7 +3,7 @@
 (:objects
 leak_000 - leak
 start_point_1 loc_1 loc_2 end_point - waypoint
-astrobee - robot
+astrobee r2 - robot
 panel_000 panel_001 - panel
 
 )
@@ -12,18 +12,21 @@ panel_000 panel_001 - panel
 (not (found leak_000 panel_000))
 (not (found leak_000 panel_001))
 
-(waypoint_not_occupied loc_2)
 (waypoint_not_occupied end_point)
 (not (waypoint_not_occupied start_point_1))
-(not (waypoint_not_occupied loc_1))
+(waypoint_not_occupied loc_1)
 
-(at astrobee loc_1)
+(at r2 start_point_1)
+(at astrobee loc_2)
 
 (canreach astrobee loc_1 panel_000)
 (canreach astrobee loc_2 panel_001)
+(canreach r2 loc_1 panel_000)
+(canreach r2 loc_2 panel_001)
 
-(canexamine astrobee loc_1 panel_000)
-(canexamine astrobee loc_2 panel_001)
+(not (canexamine astrobee loc_2 panel_001))
+(canexamine r2 loc_1 panel_000)
+(canexamine r2 loc_2 panel_001)
 
 ;; statics 
 
@@ -55,4 +58,4 @@ panel_000 panel_001 - panel
     (examined panel_000)
     (examined panel_001)
 )))
-;; This PDDL problem file was generated on 2022-08-12 11:33:56.135159
+;; This PDDL problem file was generated on 2022-11-02 17:10:17.238720

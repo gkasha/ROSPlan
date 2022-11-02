@@ -1,3 +1,5 @@
-0.0003:   (do_hover_fast astrobee loc_1 loc_2) [90.0000]
-0.0005:   (do_hover_controlled r2 start_point_1 loc_1) [100.2996]
-100.3003:   (patch_leak r2 loc_1 panel_000 leak_000) [120.0000]
+0.0003:   (do_hover_controlled r2 start_point_1 loc_1) [100.2996]
+100.3001:   (examine_panel r2 loc_1 panel_000) [10.0000]
+100.3003:   (do_hover_fast astrobee loc_2 start_point_1) [50.1498]
+100.3006:   (do_hover_controlled r2 loc_1 loc_2) [180.0000]
+280.3008:   (examine_panel r2 loc_2 panel_001) [10.0000]
